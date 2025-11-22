@@ -1,0 +1,58 @@
+# ---- PYTHON ----
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.pkl
+*.h5
+*.db
+*.sqlite3
+
+# Virtual Environments
+backend/venv/
+ml_model/venv/
+*.venv/
+venv/
+
+# Environment/Config Files
+.env
+.env.local
+.env.dev
+.env.prod
+
+# Logs
+*.log
+
+# Jupyter
+.ipynb_checkpoints/
+*.ipynb_checkpoints
+
+# Cache
+.DS_Store
+*.cache/
+cache/
+*.egg-info/
+.eggs/
+
+# ---- NODE / REACT ----
+frontend/node_modules/
+frontend/.next/
+frontend/dist/
+frontend/build/
+*.lock
+
+# ---- BLOCKCHAIN ----
+blockchain/node_modules/
+blockchain/chain_data/
+blockchain/build/
+blockchain/artifacts/
+blockchain/cache/
+
+# ---- VSCODE ----
+.vscode/
+.history/
+*.code-workspace
+
+# ---- GENERAL ----
+*.tmp
+*.swp
