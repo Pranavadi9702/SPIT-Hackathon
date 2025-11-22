@@ -51,8 +51,10 @@ function Overview() {
       {/* Top header row */}
       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div>
-          <h1 className="text-2xl font-semibold text-slate-900">Overview</h1>
-          <p className="text-sm text-slate-500 mt-1">
+          <h1 className="text-2xl font-semibold text-slate-900 dark:text-slate-100">
+            Overview
+          </h1>
+          <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
             Interactive sales insights — range:{" "}
             <span className="font-medium">{weekRange}w</span>
           </p>
@@ -60,27 +62,29 @@ function Overview() {
 
         {/* Search + filters */}
         <div className="flex items-center gap-3">
-          <div className="hidden md:flex items-center rounded-full border border-slate-200 bg-white px-3 py-1.5 text-sm shadow-sm min-w-[220px]">
+          <div className="hidden md:flex items-center rounded-full border border-slate-200/80 dark:border-slate-700 bg-white/90 dark:bg-slate-900/70 px-3 py-1.5 text-sm shadow-sm min-w-[220px]">
             <input
               type="text"
               placeholder="Filter segments..."
-              className="flex-1 outline-none text-xs text-slate-600 placeholder:text-slate-400 bg-transparent"
+              className="flex-1 outline-none text-xs text-slate-600 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 bg-transparent"
             />
-            <span className="text-slate-400 text-lg">🔍</span>
+            <span className="text-slate-400 dark:text-slate-500 text-lg">
+              🔍
+            </span>
           </div>
 
           {/* Week range dropdown */}
           <select
             value={weekRange}
             onChange={(e) => setWeekRange(Number(e.target.value))}
-            className="rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+            className="rounded-full border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-3 py-1.5 text-xs font-medium text-slate-700 dark:text-slate-100 shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
           >
             <option value={4}>Last 4 weeks</option>
             <option value={6}>Last 6 weeks</option>
             <option value={12}>Last 12 weeks</option>
           </select>
 
-          <button className="rounded-full bg-indigo-500 px-3.5 py-1.5 text-xs font-medium text-white shadow-sm hover:bg-indigo-600 transition">
+          <button className="rounded-full bg-indigo-500 px-3.5 py-1.5 text-xs font-medium text-white shadow-sm hover:bg-indigo-600 dark:hover:bg-indigo-400 transition">
             Export CSV
           </button>
         </div>
@@ -104,20 +108,20 @@ function Overview() {
 
         {/* Right: Customer Segments donut – styled like Segment Share card */}
         <div>
-          <div className="bg-white rounded-3xl border border-slate-100 shadow-sm p-5 flex flex-col h-[320px]">
+          <div className="bg-white/90 dark:bg-slate-900/80 rounded-3xl border border-slate-100 dark:border-slate-700 shadow-sm p-5 flex flex-col h-[320px]">
             {/* Header */}
             <div className="flex items-start justify-between mb-3">
               <div>
-                <h2 className="text-sm font-semibold text-slate-900">
+                <h2 className="text-sm font-semibold text-slate-900 dark:text-slate-100">
                   Customer Segments
                 </h2>
-                <p className="text-xs text-slate-500 mt-0.5">
+                <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
                   RFM distribution
                 </p>
               </div>
-              <div className="text-right text-[11px] text-slate-500">
+              <div className="text-right text-[11px] text-slate-500 dark:text-slate-400">
                 Total{" "}
-                <span className="font-semibold text-slate-900">
+                <span className="font-semibold text-slate-900 dark:text-slate-100">
                   {totalSegmentValue.toLocaleString()}
                 </span>
               </div>
@@ -125,7 +129,7 @@ function Overview() {
 
             {/* Donut + legend */}
             <div className="flex-1 flex items-center gap-3">
-              {/* Donut chart – same proportions as Segment Share card */}
+              {/* Donut chart */}
               <div className="w-1/2 h-full min-h-[220px] flex items-center justify-center">
                 <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
@@ -140,10 +144,7 @@ function Overview() {
                       strokeWidth={3}
                     >
                       {segments.map((entry) => (
-                        <Cell
-                          key={entry.name}
-                          fill={entry.color}
-                        />
+                        <Cell key={entry.name} fill={entry.color} />
                       ))}
                     </Pie>
                     <Tooltip
@@ -161,7 +162,6 @@ function Overview() {
                         fontSize: 12,
                       }}
                     />
-                    {/* no Recharts Legend – we use custom legend on right */}
                   </PieChart>
                 </ResponsiveContainer>
               </div>
@@ -171,7 +171,7 @@ function Overview() {
                 {segments.map((segment) => (
                   <div
                     key={segment.name}
-                    className="flex items-center justify-between rounded-xl px-2 py-1.5 hover:bg-slate-50 transition"
+                    className="flex items-center justify-between rounded-xl px-2 py-1.5 hover:bg-slate-50 dark:hover:bg-slate-800 transition"
                   >
                     <div className="flex items-center gap-2">
                       <span
@@ -179,15 +179,15 @@ function Overview() {
                         style={{ backgroundColor: segment.color }}
                       />
                       <div className="flex flex-col">
-                        <span className="text-xs font-semibold text-slate-900">
+                        <span className="text-xs font-semibold text-slate-900 dark:text-slate-100">
                           {segment.name}
                         </span>
-                        <span className="text-[11px] text-slate-500">
+                        <span className="text-[11px] text-slate-500 dark:text-slate-400">
                           {segment.percent.toFixed(0)}% of base
                         </span>
                       </div>
                     </div>
-                    <span className="text-xs font-semibold text-slate-900">
+                    <span className="text-xs font-semibold text-slate-900 dark:text-slate-100">
                       {segment.percent.toFixed(0)}%
                     </span>
                   </div>

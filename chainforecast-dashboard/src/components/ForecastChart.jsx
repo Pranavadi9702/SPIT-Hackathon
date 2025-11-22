@@ -22,23 +22,22 @@ function ForecastChart({ data }) {
   const filteredData = data.slice(0, weekRange);
 
   return (
-    <div className="bg-white rounded-3xl border border-slate-100 shadow-sm h-full flex flex-col">
+    <div className="bg-white/90 dark:bg-slate-900/80 rounded-3xl border border-slate-100 dark:border-slate-700 shadow-sm h-full flex flex-col">
       {/* Header */}
       <div className="px-6 pt-5 pb-3 flex items-center justify-between">
         <div>
-          <h2 className="text-sm font-semibold text-slate-900">
+          <h2 className="text-sm font-semibold text-slate-900 dark:text-slate-100">
             Sales: Actual vs Forecast
           </h2>
         </div>
 
         {/* Right controls: Dropdown + Toggles */}
-        <div className="flex items-center gap-4 text-xs text-slate-600">
-          
+        <div className="flex items-center gap-4 text-xs text-slate-600 dark:text-slate-400">
           {/* Weeks Dropdown */}
           <select
             value={weekRange}
             onChange={(e) => setWeekRange(Number(e.target.value))}
-            className="border border-slate-300 rounded-lg px-2 py-1 text-xs focus:ring-indigo-500 focus:border-indigo-500"
+            className="border border-slate-300 dark:border-slate-600 rounded-lg px-2 py-1 text-xs bg-white dark:bg-slate-900 dark:text-slate-100 focus:ring-indigo-500 focus:border-indigo-500"
           >
             <option value={4}>Last 4 weeks</option>
             <option value={8}>Last 8 weeks</option>
@@ -46,7 +45,7 @@ function ForecastChart({ data }) {
           </select>
 
           {/* Toggles */}
-          <label className="inline-flex items-center gap-1">
+          <label className="inline-flex items-center gap-1 cursor-pointer">
             <input
               type="checkbox"
               className="accent-indigo-500"
@@ -56,7 +55,7 @@ function ForecastChart({ data }) {
             <span>Show forecast</span>
           </label>
 
-          <label className="inline-flex items-center gap-1">
+          <label className="inline-flex items-center gap-1 cursor-pointer">
             <input
               type="checkbox"
               className="accent-indigo-500"
@@ -130,7 +129,7 @@ function ForecastChart({ data }) {
       </div>
 
       {/* Footer */}
-      <div className="px-6 pb-4 flex justify-between items-center text-xs text-slate-500">
+      <div className="px-6 pb-4 flex justify-between items-center text-xs text-slate-500 dark:text-slate-400">
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-1">
             <span className="w-2 h-2 rounded-full bg-[#4f46e5]" />
@@ -144,7 +143,9 @@ function ForecastChart({ data }) {
 
         <span>
           Displaying last{" "}
-          <span className="font-medium text-slate-900">{weekRange} weeks</span>
+          <span className="font-medium text-slate-900 dark:text-slate-100">
+            {weekRange} weeks
+          </span>
         </span>
       </div>
     </div>

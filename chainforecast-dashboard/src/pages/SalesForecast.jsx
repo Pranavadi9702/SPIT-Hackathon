@@ -9,20 +9,20 @@ function SalesForecast() {
       {/* Page header */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
         <div>
-          <h1 className="text-2xl font-semibold text-slate-900">
+          <h1 className="text-2xl font-semibold text-slate-900 dark:text-slate-100">
             Sales Forecast
           </h1>
-          <p className="text-sm text-slate-500 mt-1">
+          <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
             AI-powered projections for the next 4 weeks based on historical
             trends, seasonality and demand patterns.
           </p>
         </div>
 
         <div className="flex items-center gap-2 text-xs">
-          <button className="rounded-full border border-slate-200 bg-white px-3 py-1.5 font-medium text-slate-700 shadow-sm">
+          <button className="rounded-full border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-3 py-1.5 font-medium text-slate-700 dark:text-slate-100 shadow-sm">
             Last 12 weeks
           </button>
-          <button className="rounded-full bg-indigo-500 px-3.5 py-1.5 font-medium text-white shadow-sm hover:bg-indigo-600 transition">
+          <button className="rounded-full bg-indigo-500 px-3.5 py-1.5 font-medium text-white shadow-sm hover:bg-indigo-600 dark:hover:bg-indigo-400 transition">
             Export Forecast
           </button>
         </div>
@@ -32,77 +32,79 @@ function SalesForecast() {
       <div className="grid gap-4 lg:grid-cols-3">
         {/* AI Forecast summary card */}
         <div className="lg:col-span-1">
-          <div className="relative overflow-hidden rounded-3xl bg-white border border-slate-100 shadow-[0_18px_45px_rgba(15,23,42,0.06)] p-5 flex flex-col gap-4">
+          <div className="relative overflow-hidden rounded-3xl bg-white/90 dark:bg-slate-900/80 border border-slate-100 dark:border-slate-700 shadow-[0_18px_45px_rgba(15,23,42,0.06)] dark:shadow-none p-5 flex flex-col gap-4">
             {/* Accent bar */}
             <div className="absolute inset-x-5 top-0 h-0.5 rounded-b-full bg-gradient-to-r from-indigo-500/80 via-sky-500/70 to-emerald-500/70" />
 
             <div>
-              <h2 className="text-sm font-semibold text-slate-900">
+              <h2 className="text-sm font-semibold text-slate-900 dark:text-slate-100">
                 AI Forecast Summary
               </h2>
-              <p className="text-xs text-slate-500 mt-1">
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
                 High-confidence sales forecast generated from your recent
                 transaction history and customer behavior.
               </p>
             </div>
 
-            <div className="rounded-2xl bg-indigo-50/70 border border-indigo-100 px-4 py-3 text-sm">
+            <div className="rounded-2xl bg-indigo-50/70 dark:bg-indigo-500/15 border border-indigo-100 dark:border-indigo-500/40 px-4 py-3 text-sm">
               <div className="text-[11px] uppercase tracking-wide text-indigo-500 font-semibold mb-1">
                 Next 4-week forecast
               </div>
               <div className="flex items-baseline gap-2">
-                <span className="text-xl font-semibold text-slate-900">
+                <span className="text-xl font-semibold text-slate-900 dark:text-slate-100">
                   {totalForecast}
                 </span>
-                <span className="text-xs text-emerald-600 font-medium">
+                <span className="text-xs text-emerald-600 dark:text-emerald-400 font-medium">
                   +5.1% projected
                 </span>
               </div>
             </div>
 
             <div className="grid grid-cols-2 gap-3 text-xs">
-              <div className="rounded-2xl border border-slate-100 bg-slate-50/60 px-3 py-2">
-                <div className="text-[11px] text-slate-500 mb-0.5">
+              <div className="rounded-2xl border border-slate-100 dark:border-slate-700 bg-slate-50/60 dark:bg-slate-800/80 px-3 py-2">
+                <div className="text-[11px] text-slate-500 dark:text-slate-400 mb-0.5">
                   Model accuracy
                 </div>
-                <div className="font-semibold text-slate-900">94%</div>
+                <div className="font-semibold text-slate-900 dark:text-slate-100">
+                  94%
+                </div>
               </div>
-              <div className="rounded-2xl border border-slate-100 bg-slate-50/60 px-3 py-2">
-                <div className="text-[11px] text-slate-500 mb-0.5">
+              <div className="rounded-2xl border border-slate-100 dark:border-slate-700 bg-slate-50/60 dark:bg-slate-800/80 px-3 py-2">
+                <div className="text-[11px] text-slate-500 dark:text-slate-400 mb-0.5">
                   Confidence band
                 </div>
-                <div className="font-semibold text-slate-900">
+                <div className="font-semibold text-slate-900 dark:text-slate-100">
                   ± 6.5% variance
                 </div>
               </div>
             </div>
 
-            <div className="text-[11px] text-slate-500">
+            <div className="text-[11px] text-slate-500 dark:text-slate-400">
               Updated{" "}
-              <span className="font-medium text-slate-900">2 hours ago</span>.
-              Next refresh scheduled in 24 hours.
+              <span className="font-medium text-slate-900 dark:text-slate-100">
+                2 hours ago
+              </span>
+              . Next refresh scheduled in 24 hours.
             </div>
           </div>
         </div>
 
         {/* Chart card */}
         <div className="lg:col-span-2">
-          <div className="rounded-3xl border border-indigo-50 bg-gradient-to-b from-indigo-50/60 via-white to-white shadow-[0_18px_45px_rgba(15,23,42,0.06)] p-3 h-full">
-            <div className="rounded-2xl bg-white border border-slate-100 h-full flex flex-col">
+          <div className="rounded-3xl border border-indigo-50 dark:border-slate-700 bg-gradient-to-b from-indigo-50/60 via-white to-white dark:from-slate-900 dark:via-slate-950 dark:to-slate-950 shadow-[0_18px_45px_rgba(15,23,42,0.06)] dark:shadow-none p-3 h-full">
+            <div className="rounded-2xl bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-700 h-full flex flex-col">
               {/* Chart header row */}
               <div className="px-5 pt-4 pb-2 flex items-center justify-between">
                 <div>
-                  <h2 className="text-sm font-semibold text-slate-900">
+                  <h2 className="text-sm font-semibold text-slate-900 dark:text-slate-100">
                     4-Week Sales Forecast
                   </h2>
-                  <p className="text-xs text-slate-500 mt-0.5">
+                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
                     Compare AI-predicted revenue against actual performance to
                     spot gaps early.
                   </p>
                 </div>
-                <div className="flex items-center gap-3 text-[11px] text-slate-600">
-                  
-                </div>
+                <div className="flex items-center gap-3 text-[11px] text-slate-600 dark:text-slate-400"></div>
               </div>
 
               {/* Chart body */}
@@ -113,12 +115,11 @@ function SalesForecast() {
               </div>
 
               {/* Chart footer */}
-              <div className="px-5 pb-4 flex items-center justify-between text-[11px] text-slate-500">
-                <div className="flex items-center gap-4">
-                </div>
+              <div className="px-5 pb-4 flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400">
+                <div className="flex items-center gap-4" />
                 <div>
                   Model window:{" "}
-                  <span className="font-medium text-slate-900">
+                  <span className="font-medium text-slate-900 dark:text-slate-100">
                     last 12 weeks
                   </span>
                 </div>
@@ -129,8 +130,8 @@ function SalesForecast() {
       </div>
 
       {/* “How to use this” card */}
-      <div className="bg-white rounded-3xl shadow-[0_18px_45px_rgba(15,23,42,0.04)] border border-slate-100 p-5 lg:p-6 text-xs text-slate-600">
-        <h3 className="font-semibold text-slate-900 mb-2">
+      <div className="bg-white/90 dark:bg-slate-900/80 rounded-3xl shadow-[0_18px_45px_rgba(15,23,42,0.04)] dark:shadow-none border border-slate-100 dark:border-slate-700 p-5 lg:p-6 text-xs text-slate-600 dark:text-slate-300">
+        <h3 className="font-semibold text-slate-900 dark:text-slate-100 mb-2">
           How to act on this forecast
         </h3>
         <div className="grid md:grid-cols-3 gap-3">

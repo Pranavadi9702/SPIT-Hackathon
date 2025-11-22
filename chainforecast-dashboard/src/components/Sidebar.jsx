@@ -49,14 +49,6 @@ function Sidebar() {
           );
         })}
       </nav>
-
-      <button
-        onClick={() => navigate("/login")}
-        className="m-3 flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-medium text-slate-300 hover:bg-slate-800/80"
-      >
-        <ArrowRightOnRectangleIcon className="h-5 w-5" />
-        Logout
-      </button>
     </aside>
   );
 }

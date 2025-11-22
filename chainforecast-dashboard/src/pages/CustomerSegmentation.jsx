@@ -105,24 +105,26 @@ function CustomerSegmentation() {
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-semibold text-slate-900">
+          <h1 className="text-2xl font-semibold text-slate-900 dark:text-slate-100">
             Customer Segmentation
           </h1>
-          <p className="text-sm text-slate-500 mt-1">
+          <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
             RFM-based segments with behavioral metrics and cohort insights.
           </p>
         </div>
 
         <div className="flex items-center gap-3">
-          <div className="hidden md:flex items-center rounded-full border border-slate-200 bg-white px-3 py-1.5 text-sm shadow-sm min-w-[260px]">
+          <div className="hidden md:flex items-center rounded-full border border-slate-200/80 dark:border-slate-700 bg-white/90 dark:bg-slate-900/70 px-3 py-1.5 text-sm shadow-sm min-w-[260px]">
             <input
               type="text"
               placeholder="Search by name, ID or segment..."
-              className="flex-1 outline-none text-xs text-slate-600 placeholder:text-slate-400 bg-transparent"
+              className="flex-1 outline-none text-xs text-slate-600 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 bg-transparent"
             />
-            <span className="text-slate-400 text-lg">🔍</span>
+            <span className="text-slate-400 dark:text-slate-500 text-lg">
+              🔍
+            </span>
           </div>
-          <button className="rounded-full bg-indigo-500 px-3.5 py-1.5 text-xs font-medium text-white shadow-sm hover:bg-indigo-600 transition">
+          <button className="rounded-full bg-indigo-500 px-3.5 py-1.5 text-xs font-medium text-white shadow-sm hover:bg-indigo-600 dark:hover:bg-indigo-400 transition">
             Export segment report
           </button>
         </div>
@@ -133,21 +135,23 @@ function CustomerSegmentation() {
         {statsCards.map((card) => (
           <div
             key={card.id}
-            className="relative overflow-hidden rounded-3xl bg-white border border-slate-100 shadow-[0_18px_45px_rgba(15,23,42,0.06)] p-4 flex flex-col gap-3 transition-all duration-300 ease-out hover:shadow-[0_25px_55px_rgba(15,23,42,0.12)] hover:-translate-y-1 hover:scale-[1.02]"
+            className="relative overflow-hidden rounded-3xl bg-white/90 dark:bg-slate-900/80 border border-slate-100 dark:border-slate-700 shadow-[0_18px_45px_rgba(15,23,42,0.06)] dark:shadow-none p-4 flex flex-col gap-3 transition-all duration-300 ease-out hover:shadow-[0_25px_55px_rgba(15,23,42,0.12)] hover:-translate-y-1 hover:scale-[1.02]"
           >
             <div className="absolute inset-x-4 top-0 h-0.5 rounded-b-full bg-gradient-to-r from-indigo-500 via-sky-500 to-emerald-500" />
             <div className="flex items-start justify-between">
-              <div className="text-[11px] uppercase tracking-wide text-slate-500 font-medium">
+              <div className="text-[11px] uppercase tracking-wide text-slate-500 dark:text-slate-400 font-medium">
                 {card.label}
               </div>
-              <div className="h-9 w-9 rounded-2xl bg-indigo-50 border border-indigo-100 flex items-center justify-center text-lg">
+              <div className="h-9 w-9 rounded-2xl bg-indigo-50 dark:bg-indigo-500/15 border border-indigo-100 dark:border-indigo-500/40 flex items-center justify-center text-lg">
                 <span>{card.icon}</span>
               </div>
             </div>
-            <div className="text-xl font-semibold text-slate-900">
+            <div className="text-xl font-semibold text-slate-900 dark:text-slate-100">
               {card.value}
             </div>
-            <div className="text-xs text-slate-500">{card.subLabel}</div>
+            <div className="text-xs text-slate-500 dark:text-slate-400">
+              {card.subLabel}
+            </div>
           </div>
         ))}
       </div>
@@ -155,13 +159,13 @@ function CustomerSegmentation() {
       {/* Charts row */}
       <div className="grid gap-4 lg:grid-cols-3">
         {/* Bar chart: customers by segment */}
-        <div className="lg:col-span-2 bg-white rounded-3xl border border-slate-100 shadow-sm p-5 flex flex-col">
+        <div className="lg:col-span-2 bg-white/90 dark:bg-slate-900/80 rounded-3xl border border-slate-100 dark:border-slate-700 shadow-sm p-5 flex flex-col">
           <div className="flex items-center justify-between mb-3">
             <div>
-              <h2 className="text-sm font-semibold text-slate-900">
+              <h2 className="text-sm font-semibold text-slate-900 dark:text-slate-100">
                 Customers by Segment
               </h2>
-              <p className="text-xs text-slate-500 mt-0.5">
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
                 Distribution of customers across RFM segments.
               </p>
             </div>
@@ -206,19 +210,19 @@ function CustomerSegmentation() {
         </div>
 
         {/* Donut: segment share */}
-        <div className="bg-white rounded-3xl border border-slate-100 shadow-sm p-5 flex flex-col h-[320px]">
+        <div className="bg-white/90 dark:bg-slate-900/80 rounded-3xl border border-slate-100 dark:border-slate-700 shadow-sm p-5 flex flex-col h-[320px]">
           <div className="flex items-start justify-between mb-3">
             <div>
-              <h2 className="text-sm font-semibold text-slate-900">
+              <h2 className="text-sm font-semibold text-slate-900 dark:text-slate-100">
                 Segment Share
               </h2>
-              <p className="text-xs text-slate-500 mt-0.5">
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
                 Percentage contribution of each segment.
               </p>
             </div>
-            <div className="text-[11px] text-slate-500">
+            <div className="text-[11px] text-slate-500 dark:text-slate-400">
               Total{" "}
-              <span className="font-semibold text-slate-900">
+              <span className="font-semibold text-slate-900 dark:text-slate-100">
                 {totalCustomers.toLocaleString()}
               </span>
             </div>
@@ -261,7 +265,6 @@ function CustomerSegmentation() {
                       fontSize: 12,
                     }}
                   />
-                  {/* Legend intentionally omitted; we use custom legend on the right */}
                 </PieChart>
               </ResponsiveContainer>
             </div>
@@ -276,7 +279,7 @@ function CustomerSegmentation() {
                 return (
                   <div
                     key={segment.name}
-                    className="flex items-center justify-between rounded-xl px-2 py-1.5 hover:bg-slate-50 transition"
+                    className="flex items-center justify-between rounded-xl px-2 py-1.5 hover:bg-slate-50 dark:hover:bg-slate-800 transition"
                   >
                     <div className="flex items-center gap-2">
                       <span
@@ -286,11 +289,11 @@ function CustomerSegmentation() {
                             SEGMENT_COLORS[index % SEGMENT_COLORS.length],
                         }}
                       />
-                      <span className="font-medium text-slate-900">
+                      <span className="font-medium text-slate-900 dark:text-slate-100">
                         {segment.name}
                       </span>
                     </div>
-                    <span className="font-semibold text-slate-900">
+                    <span className="font-semibold text-slate-900 dark:text-slate-100">
                       {percent}%
                     </span>
                   </div>
