@@ -40,20 +40,22 @@ function SegmentsChart({ data, totalCustomers }) {
   });
 
   return (
-    <div className="bg-white rounded-3xl border border-slate-100 shadow-sm h-full flex flex-col">
+    <div className="bg-white/90 dark:bg-slate-900/80 rounded-3xl border border-slate-100 dark:border-slate-700 shadow-sm h-full flex flex-col">
       {/* Header */}
       <div className="px-6 pt-5 pb-3 flex items-start justify-between">
         <div>
-          <h2 className="text-sm font-semibold text-slate-900">
+          <h2 className="text-sm font-semibold text-slate-900 dark:text-slate-100">
             Customer Segments
           </h2>
-          <p className="text-xs text-slate-500 mt-0.5">RFM distribution</p>
+          <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+            RFM distribution
+          </p>
         </div>
-        <div className="text-right text-[11px] text-slate-500">
+        <div className="text-right text-[11px] text-slate-500 dark:text-slate-400">
           <div>Monthly</div>
           <div className="mt-0.5">
             Total{" "}
-            <span className="font-semibold text-slate-900">
+            <span className="font-semibold text-slate-900 dark:text-slate-100">
               {totalBase ? totalBase.toLocaleString() : "--"}
             </span>
           </div>
@@ -89,7 +91,7 @@ function SegmentsChart({ data, totalCustomers }) {
                             x={cx}
                             y={cy - 4}
                             textAnchor="middle"
-                            className="fill-slate-900 text-xs font-semibold"
+                            className="fill-slate-900 dark:fill-slate-100 text-xs font-semibold"
                           >
                             RFM
                           </text>
@@ -97,7 +99,7 @@ function SegmentsChart({ data, totalCustomers }) {
                             x={cx}
                             y={cy + 11}
                             textAnchor="middle"
-                            className="fill-slate-400 text-[10px]"
+                            className="fill-slate-400 dark:fill-slate-500 text-[10px]"
                           >
                             segments
                           </text>
@@ -125,22 +127,25 @@ function SegmentsChart({ data, totalCustomers }) {
         {/* Legend */}
         <div className="w-1/2 flex flex-col gap-1.5">
           {segments.map((segment) => (
-            <div key={segment.name} className="flex justify-between text-xs">
+            <div
+              key={segment.name}
+              className="flex justify-between text-xs rounded-xl px-2 py-1.5 hover:bg-slate-50 dark:hover:bg-slate-800 transition"
+            >
               <div className="flex items-center gap-2">
                 <span
                   className="w-2 h-2 rounded-full"
                   style={{ backgroundColor: segment.color }}
                 />
                 <div className="flex flex-col">
-                  <span className="font-medium text-slate-900">
+                  <span className="font-medium text-slate-900 dark:text-slate-100">
                     {segment.name}
                   </span>
-                  <span className="text-[11px] text-slate-500">
+                  <span className="text-[11px] text-slate-500 dark:text-slate-400">
                     {segment.percent.toFixed(0)}% of base
                   </span>
                 </div>
               </div>
-              <span className="font-semibold text-slate-900">
+              <span className="font-semibold text-slate-900 dark:text-slate-100">
                 {segment.percent.toFixed(0)}%
               </span>
             </div>
@@ -152,11 +157,11 @@ function SegmentsChart({ data, totalCustomers }) {
       <div className="px-6 pb-4 flex items-center gap-3">
         <button
           onClick={() => navigate("/customer-segmentation")}
-          className="rounded-full bg-indigo-500 px-4 py-1.5 text-xs font-medium text-white shadow-sm hover:bg-indigo-600 transition"
+          className="rounded-full bg-indigo-500 px-4 py-1.5 text-xs font-medium text-white shadow-sm hover:bg-indigo-600 dark:hover:bg-indigo-400 transition"
         >
           View Details
         </button>
-        <button className="rounded-full border border-slate-200 bg-white px-4 py-1.5 text-xs font-medium text-slate-700 shadow-sm">
+        <button className="rounded-full border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-4 py-1.5 text-xs font-medium text-slate-700 dark:text-slate-100 shadow-sm">
           Export
         </button>
       </div>

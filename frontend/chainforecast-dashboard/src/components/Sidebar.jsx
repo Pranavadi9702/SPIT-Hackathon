@@ -1,17 +1,11 @@
-// src/components/Sidebar.jsx
-import { NavLink, useNavigate } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 import {
   Squares2X2Icon,
   ChartBarIcon,
   UsersIcon,
   TagIcon,
   Cog6ToothIcon,
-  ArrowRightOnRectangleIcon,
 } from "@heroicons/react/24/outline";
-
-// 🔽 ADD THESE IMPORTS
-import { signOut } from "firebase/auth";
-import { auth } from "../firebase"; // make sure this path matches your firebase.js
 
 const menuItems = [
   { to: "/overview", label: "Overview", icon: Squares2X2Icon },
@@ -22,68 +16,44 @@ const menuItems = [
 ];
 
 function Sidebar() {
-  const navigate = useNavigate();
-
-  // 🔽 PROPER LOGOUT HANDLER
-  const handleLogout = async () => {
-    try {
-      await signOut(auth);              // 1. Clear Firebase auth session
-      navigate("/login", { replace: true }); // 2. Go to login page
-    } catch (err) {
-      console.error("Logout error:", err);
-      // optional: show a toast or alert here
-    }
-  };
-
   return (
-    <aside className="hidden md:flex md:flex-col w-60 bg-slate-900 text-slate-100">
-      <div className="h-16 flex items-center px-4 border-b border-slate-800">
-        <div className="h-9 w-9 rounded-2xl bg-gradient-to-br from-brand-500 to-brand-700 flex items-center justify-center text-xs font-semibold">
+    <aside className="hidden md:flex md:flex-col w-64 bg-white/95 dark:bg-slate-950 text-slate-900 dark:text-slate-100 border-r border-slate-200 dark:border-slate-800">
+      {/* Logo / brand */}
+      <div className="flex items-center gap-2 px-6 py-4 border-b border-slate-200 dark:border-slate-800">
+        <div className="h-9 w-9 rounded-xl bg-brand-500 flex items-center justify-center text-white font-semibold shadow-sm">
           CF
         </div>
-        <div className="ml-2">
-          <div className="text-xs font-semibold">ChainForecast</div>
-          <div className="text-[10px] text-slate-400">Sales AI Dashboard</div>
+        <div>
+          <div className="font-semibold tracking-tight">ChainForecast</div>
+          <div className="text-xs text-slate-500 dark:text-slate-400">
+            AI Sales Forecast &amp; CRM
+          </div>
         </div>
       </div>
 
-      <nav className="flex-1 mt-4">
-        <div className="px-3 mb-2 text-[10px] uppercase tracking-wide text-slate-500">
-          Main
-        </div>
-        <ul className="space-y-1 px-2">
-          {menuItems.map((item) => {
-            const Icon = item.icon;
-            return (
-              <li key={item.to}>
-                <NavLink
-                  to={item.to}
-                  className={({ isActive }) =>
-                    [
-                      "flex items-center gap-3 px-3 py-2 rounded-xl text-sm font-medium transition",
-                      isActive
-                        ? "bg-slate-800 text-white"
-                        : "text-slate-300 hover:bg-slate-800/70 hover:text-white",
-                    ].join(" ")
-                  }
-                >
-                  <Icon className="h-5 w-5" />
-                  <span>{item.label}</span>
-                </NavLink>
-              </li>
-            );
-          })}
-        </ul>
+      {/* Navigation */}
+      <nav className="flex-1 px-3 py-4 space-y-1">
+        {menuItems.map((item) => {
+          const Icon = item.icon;
+          return (
+            <NavLink
+              key={item.to}
+              to={item.to}
+              className={({ isActive }) =>
+                `flex items-center gap-3 px-3 py-2 rounded-xl text-sm font-medium transition
+                ${
+                  isActive
+                    ? "bg-slate-900 text-slate-100 shadow-sm dark:bg-slate-800"
+                    : "text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800/70"
+                }`
+              }
+            >
+              <Icon className="h-5 w-5" />
+              {item.label}
+            </NavLink>
+          );
+        })}
       </nav>
-
-      {/* 🔽 USE THE NEW HANDLER */}
-      <button
-        onClick={handleLogout}
-        className="m-3 flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-medium text-slate-300 hover:bg-slate-800/80"
-      >
-        <ArrowRightOnRectangleIcon className="h-5 w-5" />
-        Logout
-      </button>
     </aside>
   );
 }

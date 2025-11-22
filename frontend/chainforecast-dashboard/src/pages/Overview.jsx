@@ -297,9 +297,6 @@ function Overview() {
             Last 4 weeks
           </button>
 
-          <button className="rounded-full bg-indigo-500 px-3.5 py-1.5 text-xs font-medium text-white shadow-sm hover:bg-indigo-600 transition">
-            Export CSV
-          </button>
         </div>
       </div>
 
