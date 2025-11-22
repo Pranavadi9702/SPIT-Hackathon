@@ -11,12 +11,27 @@ import {
 
 const COLORS = ["#4f46e5", "#22c55e", "#0ea5e9", "#f97316", "#9ca3af"];
 
-function SegmentsChart({ data, totalCustomers = 8452 }) {
+function SegmentsChart({ data, totalCustomers }) {
   const navigate = useNavigate();
-  const totalValue = data.reduce((sum, d) => sum + d.value, 0);
 
-  const segments = data.map((d, index) => {
-    const percent = (d.value / totalValue) * 100;
+  // safety: ensure we always work with an array
+  const cleanData = Array.isArray(data) ? data : [];
+
+  // sum of all segment values (from backend)
+  const totalValue = cleanData.reduce(
+    (sum, d) => sum + (Number(d.value) || 0),
+    0
+  );
+
+  // ✅ totalBase = real totalCustomers (from backend) if provided,
+  //    otherwise fall back to sum of segment values
+  const totalBase =
+    typeof totalCustomers === "number" && !Number.isNaN(totalCustomers)
+      ? totalCustomers
+      : totalValue;
+
+  const segments = cleanData.map((d, index) => {
+    const percent = totalValue > 0 ? (d.value / totalValue) * 100 : 0;
     return {
       ...d,
       percent,
@@ -39,7 +54,7 @@ function SegmentsChart({ data, totalCustomers = 8452 }) {
           <div className="mt-0.5">
             Total{" "}
             <span className="font-semibold text-slate-900">
-              {totalCustomers.toLocaleString()}
+              {totalBase ? totalBase.toLocaleString() : "--"}
             </span>
           </div>
         </div>
@@ -57,7 +72,7 @@ function SegmentsChart({ data, totalCustomers = 8452 }) {
                   dataKey="value"
                   nameKey="name"
                   innerRadius={55}
-                  outerRadius={80}   // this keeps it fully visible
+                  outerRadius={80} // keeps it fully visible
                   paddingAngle={3}
                   strokeWidth={0}
                 >

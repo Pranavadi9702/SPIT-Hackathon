@@ -10,16 +10,45 @@ import {
   CartesianGrid,
 } from "recharts";
 
+/**
+ * Expects data like:
+ * [
+ *   { week: "2011-10-16", actual: 150000, forecast: null },
+ *   { week: "2011-10-23", actual: 160000, forecast: null },
+ *   ...
+ *   { week: "2011-11-20", actual: 270000, forecast: 275000 },
+ *   ...
+ * ]
+ */
 function ForecastChart({ data }) {
-  // toggles
   const [showForecast, setShowForecast] = useState(true);
   const [smoothForecast, setSmoothForecast] = useState(true);
+  const [weekRange, setWeekRange] = useState(4); // 4, 8, 12
 
-  // NEW: week dropdown state
-  const [weekRange, setWeekRange] = useState(4);
+  // Always work with an array
+  const safeData = Array.isArray(data) ? data : [];
 
-  // Slice data based on selected week range
-  const filteredData = data.slice(0, weekRange);
+  // 🔧 IMPORTANT FIX:
+  // Use the *last* N points (most recent weeks), not the first N.
+  const filteredData =
+    safeData.length > weekRange
+      ? safeData.slice(-weekRange)
+      : safeData.slice(); // if less than weekRange, just use all
+
+  // Y-axis money formatting
+  const formatYAxis = (v) => {
+    if (v == null) return "";
+    if (Math.abs(v) >= 1_000_000) {
+      return `${(v / 1_000_000).toFixed(1)}M`;
+    }
+    if (Math.abs(v) >= 1_000) {
+      return `${(v / 1_000).toFixed(1)}k`;
+    }
+    return v.toString();
+  };
+
+  const formatTooltipValue = (value) =>
+    value != null ? `₹${Number(value).toLocaleString()}` : "—";
 
   return (
     <div className="bg-white rounded-3xl border border-slate-100 shadow-sm h-full flex flex-col">
@@ -29,24 +58,26 @@ function ForecastChart({ data }) {
           <h2 className="text-sm font-semibold text-slate-900">
             Sales: Actual vs Forecast
           </h2>
+          <p className="text-xs text-slate-500 mt-0.5">
+            Weekly performance with LSTM-based forecast for the recent period.
+          </p>
         </div>
 
-        {/* Right controls: Dropdown + Toggles */}
+        {/* Right controls */}
         <div className="flex items-center gap-4 text-xs text-slate-600">
-          
           {/* Weeks Dropdown */}
           <select
             value={weekRange}
             onChange={(e) => setWeekRange(Number(e.target.value))}
-            className="border border-slate-300 rounded-lg px-2 py-1 text-xs focus:ring-indigo-500 focus:border-indigo-500"
+            className="border border-slate-300 rounded-lg px-2 py-1 text-xs focus:ring-indigo-500 focus:border-indigo-500 bg-white"
           >
             <option value={4}>Last 4 weeks</option>
             <option value={8}>Last 8 weeks</option>
             <option value={12}>Last 12 weeks</option>
           </select>
 
-          {/* Toggles */}
-          <label className="inline-flex items-center gap-1">
+          {/* Show forecast toggle */}
+          <label className="inline-flex items-center gap-1 cursor-pointer">
             <input
               type="checkbox"
               className="accent-indigo-500"
@@ -56,7 +87,8 @@ function ForecastChart({ data }) {
             <span>Show forecast</span>
           </label>
 
-          <label className="inline-flex items-center gap-1">
+          {/* Smooth forecast toggle */}
+          <label className="inline-flex items-center gap-1 cursor-pointer">
             <input
               type="checkbox"
               className="accent-indigo-500"
@@ -83,11 +115,11 @@ function ForecastChart({ data }) {
             />
             <YAxis
               tick={{ fontSize: 12, fill: "#94a3b8" }}
-              tickFormatter={(v) => `${v / 1000}k`}
+              tickFormatter={formatYAxis}
               axisLine={{ stroke: "#e5e7eb" }}
             />
             <Tooltip
-              formatter={(value) => `₹${value.toLocaleString()}`}
+              formatter={formatTooltipValue}
               labelStyle={{ fontSize: 12 }}
               contentStyle={{
                 borderRadius: 12,
@@ -95,7 +127,6 @@ function ForecastChart({ data }) {
                 fontSize: 12,
               }}
             />
-
             <Legend
               verticalAlign="top"
               align="center"

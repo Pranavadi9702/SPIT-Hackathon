@@ -37,7 +37,7 @@ except Exception as e:
 # CONFIG – EDIT ONLY PATH IF NEEDED
 # =========================================================
 
-CSV_PATH = Path(r"D:\spit hackathon\online_retail.csv")  # your dataset
+CSV_PATH = Path(r"D:\\spit hackathon\\Online_Retail.csv")  # your dataset
 
 DATE_COL = "InvoiceDate"
 QTY_COL = "Quantity"
@@ -880,7 +880,7 @@ def main():
         rfm_rule,
         PLOTS_DIR / "customer_segments_pie.png"
     )
-    
+
 
     rfm_km = rfm_kmeans(rfm, n_clusters=5)
     rfm_km.to_csv(ARTIFACTS_DIR / "rfm_segments_kmeans.csv", index=False)
