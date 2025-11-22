@@ -37,7 +37,7 @@ except Exception as e:
 # CONFIG – EDIT ONLY PATH IF NEEDED
 # =========================================================
 
-CSV_PATH = Path(r"D:\spit hackathon\online_retail.csv")  # your dataset
+CSV_PATH = Path(r"online_retail.csv")  # your dataset
 
 DATE_COL = "InvoiceDate"
 QTY_COL = "Quantity"
