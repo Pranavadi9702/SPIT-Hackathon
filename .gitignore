@@ -1,58 +1,87 @@
-# ---- PYTHON ----
+# =============================
+#        PYTHON BACKEND
+# =============================
+
 __pycache__/
 *.pyc
 *.pyo
 *.pyd
+
+# Pickle / Model Artifacts
 *.pkl
 *.h5
+
+# Databases
 *.db
 *.sqlite3
 
 # Virtual Environments
-backend/venv/
-ml_model/venv/
-*.venv/
 venv/
+.venv/
+backend/venv/
+backend/.venv/
+ml_model/venv/
+ml_model/.venv/
 
-# Environment/Config Files
+# Environment configuration
 .env
 .env.local
 .env.dev
 .env.prod
+firebase-key.json
 
 # Logs
 *.log
 
 # Jupyter
 .ipynb_checkpoints/
-*.ipynb_checkpoints
+*/.ipynb_checkpoints/
 
 # Cache
-.DS_Store
-*.cache/
-cache/
+.cache/
 *.egg-info/
 .eggs/
+*.cache
+*.tmp
 
-# ---- NODE / REACT ----
+
+# =============================
+#     FRONTEND (React + Vite)
+# =============================
+
 frontend/node_modules/
-frontend/.next/
 frontend/dist/
 frontend/build/
+frontend/.next/
 *.lock
 
-# ---- BLOCKCHAIN ----
+
+# =============================
+#     BLOCKCHAIN (Hardhat)
+# =============================
+
 blockchain/node_modules/
-blockchain/chain_data/
-blockchain/build/
 blockchain/artifacts/
 blockchain/cache/
+blockchain/coverage/
+blockchain/typechain/
+blockchain/chain_data/
+blockchain/build/
 
-# ---- VSCODE ----
+
+# =============================
+#        VS CODE SETTINGS
+# =============================
+
 .vscode/
 .history/
 *.code-workspace
 
-# ---- GENERAL ----
-*.tmp
+
+# =============================
+#        GENERAL
+# =============================
+
+.DS_Store
+Thumbs.db
 *.swp

@@ -1,0 +1,11 @@
+numpy==1.26.4
+pandas==2.2.2
+matplotlib==3.8.4
+scikit-learn==1.4.2
+joblib==1.4.2
+protobuf==4.25.3
+fastapi==0.110.0
+uvicorn[standard]==0.29.0
+python-dotenv==1.0.1
+firebase-admin==6.3.0
+web3==6.11.1
