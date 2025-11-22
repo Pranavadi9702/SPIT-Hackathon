@@ -6,6 +6,8 @@ import {
   MagnifyingGlassIcon,
   MoonIcon,
   SunIcon,
+  ExclamationTriangleIcon,
+  CheckCircleIcon,
 } from "@heroicons/react/24/outline";
 
 const titleMap = {
@@ -150,27 +152,35 @@ function Header({ theme = "light", toggleTheme }) {
 
       {/* Logout confirmation modal */}
       {showLogoutConfirm && (
-        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
-          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl p-6 w-80 text-center shadow-xl">
-            <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-100 mb-2">
-              Log out?
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-sm">
+          <div className="relative w-full max-w-sm rounded-3xl bg-white/95 dark:bg-slate-950/95 border border-slate-100/80 dark:border-slate-800 shadow-[0_24px_80px_rgba(15,23,42,0.45)] px-6 py-6">
+            {/* Accent circle */}
+            <div className="flex justify-center mb-4">
+              <div className="h-12 w-12 rounded-full bg-gradient-to-tr from-rose-500 via-amber-400 to-amber-300 flex items-center justify-center shadow-md">
+                <ExclamationTriangleIcon className="h-6 w-6 text-white" />
+              </div>
+            </div>
+
+            <h2 className="text-lg font-semibold text-center text-slate-900 dark:text-slate-50">
+              Log out of ChainForecast?
             </h2>
-            <p className="text-sm text-slate-600 dark:text-slate-400 mb-4">
-              Are you sure you want to log out?
+            <p className="mt-2 text-sm text-center text-slate-600 dark:text-slate-400">
+              You’ll be signed out of your dashboard. You can log back in any
+              time with your analyst credentials.
             </p>
 
-            <div className="flex items-center justify-center gap-3">
-              <button
-                onClick={confirmLogout}
-                className="px-4 py-1.5 bg-red-600 text-white rounded-lg text-sm hover:bg-red-700"
-              >
-                Yes
-              </button>
+            <div className="mt-5 flex flex-col-reverse sm:flex-row gap-2 sm:gap-3">
               <button
                 onClick={() => setShowLogoutConfirm(false)}
-                className="px-4 py-1.5 bg-slate-200 dark:bg-slate-700 text-slate-800 dark:text-slate-100 rounded-lg text-sm hover:bg-slate-300 dark:hover:bg-slate-600"
+                className="flex-1 rounded-full border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 py-2.5 text-sm font-medium text-slate-700 dark:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-800 transition"
               >
-                No
+                Stay logged in
+              </button>
+              <button
+                onClick={confirmLogout}
+                className="flex-1 rounded-full bg-rose-600 py-2.5 text-sm font-medium text-white shadow-sm hover:bg-rose-700 transition"
+              >
+                Yes, log me out
               </button>
             </div>
           </div>
@@ -179,11 +189,19 @@ function Header({ theme = "light", toggleTheme }) {
 
       {/* Logout success modal */}
       {showLogoutSuccess && (
-        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
-          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl p-6 w-72 text-center shadow-xl">
-            <h2 className="text-lg font-semibold text-emerald-600 dark:text-emerald-400 mb-2">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-sm">
+          <div className="w-full max-w-xs rounded-3xl bg-white/95 dark:bg-slate-950/95 border border-slate-100/80 dark:border-slate-800 shadow-[0_20px_60px_rgba(15,23,42,0.38)] px-6 py-5 text-center">
+            <div className="flex justify-center mb-3">
+              <div className="h-10 w-10 rounded-full bg-emerald-500 flex items-center justify-center">
+                <CheckCircleIcon className="h-6 w-6 text-white" />
+              </div>
+            </div>
+            <h2 className="text-sm font-semibold text-emerald-600 dark:text-emerald-400">
               Logout successful
             </h2>
+            <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
+              Redirecting you to the login screen…
+            </p>
           </div>
         </div>
       )}

@@ -4,7 +4,8 @@ import { useNavigate } from "react-router-dom";
 function Login() {
   const navigate = useNavigate();
 
-  const [activeTab, setActiveTab] = useState("login"); // "login" | "signup"
+  const [activeTab, setActiveTab] = useState("login"); 
+  const [signupSuccess, setSignupSuccess] = useState(false); // "login" | "signup"
 
   // Login form state
   const [loginEmail, setLoginEmail] = useState("");
@@ -27,262 +28,381 @@ function Login() {
     setLoginErrors(errors);
 
     if (Object.keys(errors).length === 0) {
-      // TODO: replace with real auth call later
-      // For now just navigate to dashboard
       navigate("/overview");
     }
   };
 
   const handleSignupSubmit = (e) => {
-    e.preventDefault();
-    const errors = {};
-    if (!signupName.trim()) errors.name = "Full name is required.";
-    if (!signupEmail.trim()) errors.email = "Email is required.";
-    if (!signupPassword.trim()) errors.password = "Password is required.";
-    if (!signupConfirmPassword.trim()) {
-      errors.confirmPassword = "Please confirm your password.";
-    } else if (signupPassword !== signupConfirmPassword) {
-      errors.confirmPassword = "Passwords do not match.";
-    }
+  e.preventDefault();
+  const errors = {};
+  if (!signupName.trim()) errors.name = "Full name is required.";
+  if (!signupEmail.trim()) errors.email = "Email is required.";
+  if (!signupPassword.trim()) errors.password = "Password is required.";
+  if (!signupConfirmPassword.trim()) {
+    errors.confirmPassword = "Please confirm your password.";
+  } else if (signupPassword !== signupConfirmPassword) {
+    errors.confirmPassword = "Passwords do not match.";
+  }
 
-    setSignupErrors(errors);
+  setSignupErrors(errors);
 
-    if (Object.keys(errors).length === 0) {
-      // TODO: send signup data to backend later
-      // For now just show a fake success + switch to login
-      alert("Signup successful (frontend only). You can now log in.");
+  if (Object.keys(errors).length === 0) {
+    setSignupSuccess(true);
+
+    setTimeout(() => {
       setActiveTab("login");
+      setSignupSuccess(false);
       setLoginEmail(signupEmail);
-    }
-  };
+    }, 1500);
+  }
+};
+
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-slate-950 px-4">
-      <div className="w-full max-w-md bg-white rounded-3xl shadow-2xl p-6 sm:p-8 border border-slate-100">
-        {/* Logo + title */}
-        <div className="flex items-center gap-3 mb-6">
-          <div className="h-10 w-10 rounded-2xl bg-gradient-to-br from-brand-500 to-brand-700 text-white flex items-center justify-center font-semibold">
-            CF
+    <div className="min-h-screen flex items-center justify-center bg-slate-100 px-4 py-6">
+      <div className="w-full max-w-5xl">
+        {/* Outer frame */}
+        <div className="relative grid grid-cols-1 md:grid-cols-2 gap-0 rounded-[32px] bg-transparent">
+          {/* Left hero panel */}
+          <div className="relative overflow-hidden rounded-t-[32px] md:rounded-l-[32px] md:rounded-tr-none bg-slate-950 text-white px-8 py-8 flex flex-col">
+            {/* Decorative shapes */}
+            <div className="pointer-events-none absolute -top-24 -left-20 h-72 w-72 rounded-full border-[14px] border-slate-400/30" />
+            <div className="pointer-events-none absolute 10 -bottom-24 -right-10 h-80 w-80 rounded-full border-[14px] border-slate-500/25" />
+            <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-slate-900/40 via-slate-900/10 to-black/90" />
+
+            {/* Content above overlay */}
+            <div className="relative flex-1 flex flex-col">
+              {/* Top brand + nav */}
+              <div className="flex items-center justify-between mb-10">
+                <div className="flex items-center gap-3">
+                  <div className="h-9 w-9 rounded-2xl bg-white/10 border border-white/20 flex items-center justify-center text-sm font-semibold shadow-lg">
+                    CF
+                  </div>
+                  <span className="text-sm font-semibold tracking-wide">
+                    ChainForecast
+                  </span>
+                </div>
+              </div>
+
+              {/* Center message */}
+              <div className="mt-auto mb-8">
+                <p className="text-[11px] tracking-[0.2em] uppercase text-slate-400 mb-3">
+                  AI SALES FORECAST &amp; CRM
+                </p>
+                <h1 className="text-3xl md:text-4xl font-semibold leading-tight">
+                  Welcome back,
+                  <br />
+                  Analyst.
+                </h1>
+                <p className="mt-3 text-sm text-slate-300 max-w-xs">
+                  Log in to explore revenue forecasts, customer segments and
+                  campaign insights in a single dashboard.
+                </p>
+              </div>
+            </div>
+
+            {/* Bottom info */}
+            <div className="relative flex items-center justify-between text-[11px] text-slate-400">
+              <span>Secure access • SSO ready • Role-based controls</span>
+            </div>
           </div>
-          <div>
-            <div className="text-sm font-semibold text-slate-900">
-              ChainForecast
+
+          {/* Right auth panel */}
+          <div className="bg-white rounded-b-[32px] md:rounded-r-[32px] md:rounded-bl-none shadow-[0_30px_60px_rgba(15,23,42,0.18)] border border-slate-200 px-7 sm:px-9 py-7 sm:py-9 flex flex-col">
+            {/* Small brand for mobile */}
+            <div className="md:hidden mb-4 flex items-center gap-2">
+              <div className="h-7 w-7 rounded-xl bg-slate-900 text-white flex items-center justify-center text-xs font-semibold">
+                CF
+              </div>
+              <span className="text-xs font-semibold text-slate-700">
+                ChainForecast
+              </span>
             </div>
-            <div className="text-xs text-slate-500">
-              AI-Powered Sales Forecasting & CRM
+
+            {/* Log in / Sign up toggle */}
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-semibold text-slate-900">
+                {activeTab === "login" ? "Log in" : "Sign up"}
+              </h2>
+
+              <div className="inline-flex rounded-full bg-slate-100 px-1 py-1 text-[11px] font-medium">
+                <button
+                  type="button"
+                  onClick={() => setActiveTab("login")}
+                  className={`px-3 py-1 rounded-full transition ${
+                    activeTab === "login"
+                      ? "bg-slate-900 text-white shadow-sm"
+                      : "text-slate-500 hover:text-slate-800"
+                  }`}
+                >
+                  Log in
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setActiveTab("signup")}
+                  className={`px-3 py-1 rounded-full transition ${
+                    activeTab === "signup"
+                      ? "bg-slate-900 text-white shadow-sm"
+                      : "text-slate-500 hover:text-slate-800"
+                  }`}
+                >
+                  Sign up
+                </button>
+              </div>
             </div>
+
+            <p className="text-xs text-slate-500 mb-5">
+              {activeTab === "login"
+                ? "Enter your details to access the ChainForecast dashboard."
+                : "Create your analyst account to start forecasting sales and segmenting customers."}
+            </p>
+
+            {/* LOGIN FORM */}
+            {activeTab === "login" && (
+              <form onSubmit={handleLoginSubmit} className="space-y-4 text-sm">
+                <div>
+                  <label className="block text-xs font-medium text-slate-700 mb-1.5">
+                    Work Email
+                  </label>
+                  <div
+                    className={`flex items-center rounded-full px-3 py-2 border text-xs bg-slate-100 ${
+                      loginErrors.email
+                        ? "border-red-300"
+                        : "border-slate-200"
+                    }`}
+                  >
+                    <span className="mr-2 text-slate-400 text-[13px]">
+                      @
+                    </span>
+                    <input
+                      type="email"
+                      className="w-full bg-transparent outline-none text-slate-900 placeholder:text-slate-400"
+                      placeholder="you@company.com"
+                      value={loginEmail}
+                      onChange={(e) => setLoginEmail(e.target.value)}
+                    />
+                  </div>
+                  {loginErrors.email && (
+                    <p className="text-xs text-red-500 mt-1">
+                      {loginErrors.email}
+                    </p>
+                  )}
+                </div>
+
+                <div>
+                  <label className="block text-xs font-medium text-slate-700 mb-1.5">
+                    Password
+                  </label>
+                  <div
+                    className={`flex items-center rounded-full px-3 py-2 border text-xs bg-slate-100 ${
+                      loginErrors.password
+                        ? "border-red-300"
+                        : "border-slate-200"
+                    }`}
+                  >
+                    <span className="mr-2 text-slate-400 text-[13px]">
+                      •••
+                    </span>
+                    <input
+                      type="password"
+                      className="w-full bg-transparent outline-none text-slate-900 placeholder:text-slate-400"
+                      placeholder="Enter your password"
+                      value={loginPassword}
+                      onChange={(e) => setLoginPassword(e.target.value)}
+                    />
+                  </div>
+                  {loginErrors.password && (
+                    <p className="text-xs text-red-500 mt-1">
+                      {loginErrors.password}
+                    </p>
+                  )}
+                </div>
+
+                <div className="flex items-center justify-between text-[11px]">
+                  <label className="inline-flex items-center gap-2 text-slate-600">
+                    <input
+                      type="checkbox"
+                      className="rounded border-slate-300"
+                      checked={rememberMe}
+                      onChange={(e) => setRememberMe(e.target.checked)}
+                    />
+                    <span>Remember me</span>
+                  </label>
+                  <button
+                    type="button"
+                    className="text-slate-400 hover:text-slate-700"
+                  >
+                    Forgot password?
+                  </button>
+                </div>
+
+                <button
+                  type="submit"
+                  className="w-full mt-2 rounded-full bg-slate-900 text-white font-medium py-2.5 text-sm shadow-sm hover:bg-black transition"
+                >
+                  Log in
+                </button>
+
+                <div className="flex items-center gap-3 my-3">
+                  <div className="h-px flex-1 bg-slate-200" />
+                  <span className="text-[11px] text-slate-400">or</span>
+                  <div className="h-px flex-1 bg-slate-200" />
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => setActiveTab("signup")}
+                  className="w-full rounded-full bg-slate-100 text-slate-700 font-medium py-2.5 text-sm hover:bg-slate-200 transition"
+                >
+                  Create a new account
+                </button>
+                {signupSuccess && (
+  <p className="text-xs text-emerald-600 text-center mt-2 font-medium">
+    Signup successful! Redirecting to login…
+  </p>
+)}
+
+              </form>
+            )}
+
+            {/* SIGNUP FORM */}
+            {activeTab === "signup" && (
+              <form onSubmit={handleSignupSubmit} className="space-y-4 text-sm">
+                <div className="grid grid-cols-1 gap-3">
+                  <div>
+                    <label className="block text-xs font-medium text-slate-700 mb-1.5">
+                      Full name
+                    </label>
+                    <div
+                      className={`flex items-center rounded-full px-3 py-2 border text-xs bg-slate-100 ${
+                        signupErrors.name
+                          ? "border-red-300"
+                          : "border-slate-200"
+                      }`}
+                    >
+                      <input
+                        type="text"
+                        className="w-full bg-transparent outline-none text-slate-900 placeholder:text-slate-400"
+                        placeholder="Your name"
+                        value={signupName}
+                        onChange={(e) => setSignupName(e.target.value)}
+                      />
+                    </div>
+                    {signupErrors.name && (
+                      <p className="text-xs text-red-500 mt-1">
+                        {signupErrors.name}
+                      </p>
+                    )}
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-medium text-slate-700 mb-1.5">
+                      Work email
+                    </label>
+                    <div
+                      className={`flex items-center rounded-full px-3 py-2 border text-xs bg-slate-100 ${
+                        signupErrors.email
+                          ? "border-red-300"
+                          : "border-slate-200"
+                      }`}
+                    >
+                      <span className="mr-2 text-slate-400 text-[13px]">
+                        @
+                      </span>
+                      <input
+                        type="email"
+                        className="w-full bg-transparent outline-none text-slate-900 placeholder:text-slate-400"
+                        placeholder="you@company.com"
+                        value={signupEmail}
+                        onChange={(e) => setSignupEmail(e.target.value)}
+                      />
+                    </div>
+                    {signupErrors.email && (
+                      <p className="text-xs text-red-500 mt-1">
+                        {signupErrors.email}
+                      </p>
+                    )}
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-medium text-slate-700 mb-1.5">
+                    Password
+                  </label>
+                  <div
+                    className={`flex items-center rounded-full px-3 py-2 border text-xs bg-slate-100 ${
+                      signupErrors.password
+                        ? "border-red-300"
+                        : "border-slate-200"
+                    }`}
+                  >
+                    <span className="mr-2 text-slate-400 text-[13px]">
+                      •••
+                    </span>
+                    <input
+                      type="password"
+                      className="w-full bg-transparent outline-none text-slate-900 placeholder:text-slate-400"
+                      placeholder="Create a password"
+                      value={signupPassword}
+                      onChange={(e) => setSignupPassword(e.target.value)}
+                    />
+                  </div>
+                  {signupErrors.password && (
+                    <p className="text-xs text-red-500 mt-1">
+                      {signupErrors.password}
+                    </p>
+                  )}
+                </div>
+
+                <div>
+                  <label className="block text-xs font-medium text-slate-700 mb-1.5">
+                    Confirm password
+                  </label>
+                  <div
+                    className={`flex items-center rounded-full px-3 py-2 border text-xs bg-slate-100 ${
+                      signupErrors.confirmPassword
+                        ? "border-red-300"
+                        : "border-slate-200"
+                    }`}
+                  >
+                    <input
+                      type="password"
+                      className="w-full bg-transparent outline-none text-slate-900 placeholder:text-slate-400"
+                      placeholder="Repeat your password"
+                      value={signupConfirmPassword}
+                      onChange={(e) =>
+                        setSignupConfirmPassword(e.target.value)
+                      }
+                    />
+                  </div>
+                  {signupErrors.confirmPassword && (
+                    <p className="text-xs text-red-500 mt-1">
+                      {signupErrors.confirmPassword}
+                    </p>
+                  )}
+                </div>
+
+                <button
+                  type="submit"
+                  className="w-full mt-1 rounded-full bg-slate-900 text-white font-medium py-2.5 text-sm shadow-sm hover:bg-black transition"
+                >
+                  Create account
+                </button>
+
+                <p className="text-[11px] text-slate-400 text-center mt-2">
+                  Already have an account?{" "}
+                  <button
+                    type="button"
+                    onClick={() => setActiveTab("login")}
+                    className="underline underline-offset-2 text-slate-700"
+                  >
+                    Log in
+                  </button>
+                </p>
+              </form>
+            )}
           </div>
         </div>
-
-        {/* Tabs */}
-        <div className="flex mb-6 bg-slate-100 rounded-2xl p-1 text-xs font-medium">
-          <button
-            type="button"
-            onClick={() => setActiveTab("login")}
-            className={`flex-1 py-2 rounded-2xl transition ${
-              activeTab === "login"
-                ? "bg-white shadow-sm text-slate-900"
-                : "text-slate-500 hover:text-slate-800"
-            }`}
-          >
-            Login
-          </button>
-          <button
-            type="button"
-            onClick={() => setActiveTab("signup")}
-            className={`flex-1 py-2 rounded-2xl transition ${
-              activeTab === "signup"
-                ? "bg-white shadow-sm text-slate-900"
-                : "text-slate-500 hover:text-slate-800"
-            }`}
-          >
-            Sign Up
-          </button>
-        </div>
-
-        {/* Heading + subtitle */}
-        {activeTab === "login" ? (
-          <>
-            <h1 className="text-lg font-semibold text-slate-900 mb-1">
-              Welcome back
-            </h1>
-            <p className="text-xs text-slate-500 mb-4">
-              Login to access ChainForecast analytics dashboard.
-            </p>
-          </>
-        ) : (
-          <>
-            <h1 className="text-lg font-semibold text-slate-900 mb-1">
-              Create analyst account
-            </h1>
-            <p className="text-xs text-slate-500 mb-4">
-              Sign up to get access.
-            </p>
-          </>
-        )}
-
-        {/* LOGIN FORM */}
-        {activeTab === "login" && (
-          <form onSubmit={handleLoginSubmit} className="space-y-4 text-sm">
-            <div>
-              <label className="block text-xs font-medium text-slate-700 mb-1">
-                Work Email
-              </label>
-              <input
-                type="email"
-                className={`w-full border rounded-xl px-3 py-2 focus:outline-none focus:ring-2 text-sm ${
-                  loginErrors.email
-                    ? "border-red-300 focus:ring-red-200"
-                    : "border-slate-200 focus:ring-brand-100"
-                }`}
-                placeholder="you@company.com"
-                value={loginEmail}
-                onChange={(e) => setLoginEmail(e.target.value)}
-              />
-              {loginErrors.email && (
-                <p className="text-xs text-red-500 mt-1">{loginErrors.email}</p>
-              )}
-            </div>
-
-            <div>
-              <label className="block text-xs font-medium text-slate-700 mb-1">
-                Password
-              </label>
-              <input
-                type="password"
-                className={`w-full border rounded-xl px-3 py-2 focus:outline-none focus:ring-2 text-sm ${
-                  loginErrors.password
-                    ? "border-red-300 focus:ring-red-200"
-                    : "border-slate-200 focus:ring-brand-100"
-                }`}
-                placeholder="••••••••"
-                value={loginPassword}
-                onChange={(e) => setLoginPassword(e.target.value)}
-              />
-              {loginErrors.password && (
-                <p className="text-xs text-red-500 mt-1">
-                  {loginErrors.password}
-                </p>
-              )}
-            </div>
-
-            <div className="flex items-center justify-between text-xs">
-              <label className="inline-flex items-center gap-2">
-                <input
-                  type="checkbox"
-                  className="rounded border-slate-300"
-                  checked={rememberMe}
-                  onChange={(e) => setRememberMe(e.target.checked)}
-                />
-                <span className="text-slate-600">Remember me</span>
-              </label>
-              <span className="text-slate-400">For authorized analysts only</span>
-            </div>
-
-            <button
-              type="submit"
-              className="w-full mt-2 bg-gradient-to-r from-brand-500 to-brand-700 text-white font-medium py-2.5 rounded-xl text-sm shadow-sm hover:shadow-md transition"
-            >
-              Login
-            </button>
-          </form>
-        )}
-
-        {/* SIGNUP FORM */}
-        {activeTab === "signup" && (
-          <form onSubmit={handleSignupSubmit} className="space-y-4 text-sm">
-            <div>
-              <label className="block text-xs font-medium text-slate-700 mb-1">
-                Full Name
-              </label>
-              <input
-                type="text"
-                className={`w-full border rounded-xl px-3 py-2 focus:outline-none focus:ring-2 text-sm ${
-                  signupErrors.name
-                    ? "border-red-300 focus:ring-red-200"
-                    : "border-slate-200 focus:ring-brand-100"
-                }`}
-                placeholder="Your name"
-                value={signupName}
-                onChange={(e) => setSignupName(e.target.value)}
-              />
-              {signupErrors.name && (
-                <p className="text-xs text-red-500 mt-1">{signupErrors.name}</p>
-              )}
-            </div>
-
-            <div>
-              <label className="block text-xs font-medium text-slate-700 mb-1">
-                Work Email
-              </label>
-              <input
-                type="email"
-                className={`w-full border rounded-xl px-3 py-2 focus:outline-none focus:ring-2 text-sm ${
-                  signupErrors.email
-                    ? "border-red-300 focus:ring-red-200"
-                    : "border-slate-200 focus:ring-brand-100"
-                }`}
-                placeholder="you@company.com"
-                value={signupEmail}
-                onChange={(e) => setSignupEmail(e.target.value)}
-              />
-              {signupErrors.email && (
-                <p className="text-xs text-red-500 mt-1">{signupErrors.email}</p>
-              )}
-            </div>
-
-            <div>
-              <label className="block text-xs font-medium text-slate-700 mb-1">
-                Password
-              </label>
-              <input
-                type="password"
-                className={`w-full border rounded-xl px-3 py-2 focus:outline-none focus:ring-2 text-sm ${
-                  signupErrors.password
-                    ? "border-red-300 focus:ring-red-200"
-                    : "border-slate-200 focus:ring-brand-100"
-                }`}
-                placeholder="Create a password"
-                value={signupPassword}
-                onChange={(e) => setSignupPassword(e.target.value)}
-              />
-              {signupErrors.password && (
-                <p className="text-xs text-red-500 mt-1">
-                  {signupErrors.password}
-                </p>
-              )}
-            </div>
-
-            <div>
-              <label className="block text-xs font-medium text-slate-700 mb-1">
-                Confirm Password
-              </label>
-              <input
-                type="password"
-                className={`w-full border rounded-xl px-3 py-2 focus:outline-none focus:ring-2 text-sm ${
-                  signupErrors.confirmPassword
-                    ? "border-red-300 focus:ring-red-200"
-                    : "border-slate-200 focus:ring-brand-100"
-                }`}
-                placeholder="Repeat your password"
-                value={signupConfirmPassword}
-                onChange={(e) => setSignupConfirmPassword(e.target.value)}
-              />
-              {signupErrors.confirmPassword && (
-                <p className="text-xs text-red-500 mt-1">
-                  {signupErrors.confirmPassword}
-                </p>
-              )}
-            </div>
-
-            <button
-              type="submit"
-              className="w-full mt-1 bg-slate-900 text-white font-medium py-2.5 rounded-xl text-sm shadow-sm hover:bg-slate-800 transition"
-            >
-              Create Account
-            </button>
-          </form>
-        )}
       </div>
     </div>
   );
