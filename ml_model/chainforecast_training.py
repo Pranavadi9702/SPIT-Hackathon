@@ -20,7 +20,7 @@ import matplotlib.pyplot as plt  # <-- for plots
 # TensorFlow / LSTM
 # =======================
 try:
-    import tensorflow as tf
+    import tensorflow as tf # type: ignore
     TF_IMPORT_ERROR = None
 
     # set seeds for reproducibility
