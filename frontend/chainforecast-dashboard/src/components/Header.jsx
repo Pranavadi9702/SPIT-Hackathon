@@ -12,7 +12,7 @@ import {
 } from "@heroicons/react/24/outline";
 
 import { auth } from "../firebase";              // 👈 your firebase config
-import { signOut } from "firebase/auth";         // 👈 firebase logout
+import { signOut, onAuthStateChanged } from "firebase/auth";         // 👈 firebase logout
 
 const titleMap = {
   "/overview": "Overview",
@@ -33,6 +33,26 @@ function Header({ theme = "light", toggleTheme }) {
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
   const [showLogoutSuccess, setShowLogoutSuccess] = useState(false);
   const [logoutError, setLogoutError] = useState("");
+  const [userPhoto, setUserPhoto] = useState(null);
+  const [userName, setUserName] = useState("");
+
+  // Get user's profile photo from Firebase
+  useEffect(() => {
+    const unsub = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        console.log("User logged in:", user.displayName, user.photoURL);
+        if (user.photoURL) {
+          setUserPhoto(user.photoURL);
+        }
+        if (user.displayName) {
+          setUserName(user.displayName);
+        } else if (user.email) {
+          setUserName(user.email);
+        }
+      }
+    });
+    return () => unsub();
+  }, []);
 
   const profileButtonRef = useRef(null);
   const menuRef = useRef(null);
@@ -114,7 +134,7 @@ function Header({ theme = "light", toggleTheme }) {
             <MagnifyingGlassIcon className="h-4 w-4 text-slate-400" />
             <input
               type="text"
-              placeholder="Search in ChainForecast..."
+              placeholder="Search dashboard..."
               className="bg-transparent border-none focus:outline-none text-sm px-2 w-40 lg:w-56 placeholder:text-slate-400 dark:placeholder:text-slate-500 text-slate-800 dark:text-slate-100"
             />
           </div>
@@ -146,11 +166,15 @@ function Header({ theme = "light", toggleTheme }) {
               onClick={() => setIsMenuOpen((prev) => !prev)}
               className="flex items-center gap-2 rounded-full border border-slate-200 dark:border-slate-700 px-2 py-1 hover:bg-slate-50 dark:hover:bg-slate-800"
             >
-              <div className="h-8 w-8 rounded-full bg-gradient-to-br from-indigo-500 to-indigo-700 text-white flex items-center justify-center text-xs font-semibold">
-                SD
-              </div>
+              {userPhoto ? (
+                <img
+                  src={userPhoto}
+                  alt="User profile"
+                  className="h-8 w-8 rounded-full object-cover border border-indigo-200"
+                />
+              ) : null}
               <span className="hidden sm:inline text-sm text-slate-700 dark:text-slate-100">
-                Analyst
+                {userName || "User"}
               </span>
               <ChevronDownIcon className="h-4 w-4 text-slate-400 dark:text-slate-300" />
             </button>
@@ -158,8 +182,16 @@ function Header({ theme = "light", toggleTheme }) {
             {isMenuOpen && (
               <div
                ref={menuRef}
-               className="absolute right-0 mt-2 w-40 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 shadow-lg py-1 z-70 pointer-events-auto"
+               className="absolute right-0 mt-2 w-48 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 shadow-lg py-1 z-70 pointer-events-auto"
               >
+                <div className="px-4 py-2 border-b border-slate-200 dark:border-slate-700">
+                  <p className="text-sm font-semibold text-slate-900 dark:text-slate-100">
+                    {userName || "User"}
+                  </p>
+                  <p className="text-xs text-slate-500 dark:text-slate-400">
+                    Account
+                  </p>
+                </div>
                 <button
                   onClick={handleSettings}
                   className="w-full text-left px-4 py-2 text-sm text-slate-700 dark:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-800"
@@ -189,11 +221,11 @@ function Header({ theme = "light", toggleTheme }) {
             </div>
 
             <h2 className="text-lg font-semibold text-center text-slate-900 dark:text-slate-50">
-              Log out of ChainForecast?
+              Log out of Dashboard?
             </h2>
             <p className="mt-2 text-sm text-center text-slate-600 dark:text-slate-400">
-              You’ll be signed out of your dashboard. You can log back in
-              any time with your ChainForecast account.
+              You'll be signed out of your dashboard. You can log back in
+              any time with your account.
             </p>
 
             {logoutError && (

@@ -200,11 +200,11 @@ function Login() {
                     />
                   ) : (
                     <div className="h-9 w-9 rounded-2xl bg-white/10 border border-white/20 flex items-center justify-center text-sm font-semibold shadow-lg">
-                      CF
+                      D
                     </div>
                   )}
                   <span className="text-sm font-semibold tracking-wide">
-                    ChainForecast
+                    Dashboard
                   </span>
                 </div>
               </div>
@@ -244,11 +244,11 @@ function Login() {
                 />
               ) : (
                 <div className="h-7 w-7 rounded-xl bg-slate-900 text-white flex items-center justify-center text-xs font-semibold">
-                  CF
+                  D
                 </div>
               )}
               <span className="text-xs font-semibold text-slate-700">
-                ChainForecast
+                Dashboard
               </span>
             </div>
 
@@ -294,7 +294,7 @@ function Login() {
 
             <p className="text-xs text-slate-500 mb-5">
               {activeTab === "login"
-                ? "Enter your details to access the ChainForecast dashboard."
+                ? "Enter your details to access the dashboard."
                 : "Create your analyst account to start forecasting sales and segmenting customers."}
             </p>
 

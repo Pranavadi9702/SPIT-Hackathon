@@ -1,0 +1,11 @@
+<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <!-- Orange circle with yellow center (top-left) -->
+  <circle cx="75" cy="75" r="55" fill="#FF6B35" />
+  <circle cx="75" cy="75" r="35" fill="#FFA500" />
+  <circle cx="75" cy="75" r="20" fill="#FFD700" />
+  
+  <!-- Dark blue circle with yellow center (bottom-right) -->
+  <circle cx="125" cy="125" r="55" fill="#1A2332" />
+  <circle cx="125" cy="125" r="35" fill="#2C3E50" />
+  <circle cx="125" cy="125" r="20" fill="#FFD700" />
+</svg>

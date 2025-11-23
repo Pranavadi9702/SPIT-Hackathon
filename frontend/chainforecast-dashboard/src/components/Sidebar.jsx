@@ -6,6 +6,7 @@ import {
   TagIcon,
   Cog6ToothIcon,
 } from "@heroicons/react/24/outline";
+import logo from "../assets/logo.svg";
 
 const menuItems = [
   { to: "/overview", label: "Overview", icon: Squares2X2Icon },
@@ -19,14 +20,12 @@ function Sidebar() {
   return (
     <aside className="hidden md:flex md:flex-col w-64 bg-white/95 dark:bg-slate-950 text-slate-900 dark:text-slate-100 border-r border-slate-200 dark:border-slate-800">
       {/* Logo / brand */}
-      <div className="flex items-center gap-2 px-6 py-4 border-b border-slate-200 dark:border-slate-800">
-        <div className="h-9 w-9 rounded-xl bg-brand-500 flex items-center justify-center text-white font-semibold shadow-sm">
-          CF
-        </div>
+      <div className="flex items-center gap-3 px-6 py-4 border-b border-slate-200 dark:border-slate-800">
+        <img src={logo} alt="Logo" className="h-10 w-10" />
         <div>
-          <div className="font-semibold tracking-tight">ChainForecast</div>
+          <div className="font-semibold tracking-tight">Dashboard</div>
           <div className="text-xs text-slate-500 dark:text-slate-400">
-            AI Sales Forecast &amp; CRM
+            Analytics &amp; Insights
           </div>
         </div>
       </div>

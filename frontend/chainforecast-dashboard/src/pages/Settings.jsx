@@ -10,7 +10,7 @@ function Settings() {
   // User details (uses Firebase auth when available)
   const [user, setUser] = useState({
     name: "Analyst User",
-    email: "analyst@chainforecast.ai",
+    email: "analyst@dashboard.ai",
     role: "Sales & CRM Analyst",
     photoURL: null,
   });
@@ -107,7 +107,7 @@ function Settings() {
                 Profile
               </h2>
               <p className="text-xs text-slate-500 dark:text-slate-400">
-                Manage your ChainForecast account details.
+                Manage your account details.
               </p>
             </div>
           </div>
@@ -246,7 +246,7 @@ function Settings() {
             Danger zone
           </h3>
           <p className="text-[11px] text-slate-600 dark:text-slate-400 mb-3">
-            Deleting your account will remove your access to the ChainForecast
+            Deleting your account will remove your access to the dashboard
             dashboard. This action cannot be undone.
           </p>
 

@@ -16,6 +16,9 @@ function SalesForecast() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
+  // 🔁 NEW: runtime projected change vs last 4 weeks (from backend)
+  const [forecastChangePct, setForecastChangePct] = useState(null);
+
   useEffect(() => {
     const loadData = async () => {
       try {
@@ -35,6 +38,11 @@ function SalesForecast() {
           setModelAccuracy(`${data.metrics.accuracy_pct.toFixed(2)}%`);
         }
 
+        // ✅ read forecast_change_pct from backend metrics and store it
+        if (data.metrics && data.metrics.forecast_change_pct != null) {
+          setForecastChangePct(data.metrics.forecast_change_pct);
+        }
+
         if (data.weeklySalesData && data.weeklySalesData.length > 0) {
           setChartData(data.weeklySalesData);
         }
@@ -48,6 +56,22 @@ function SalesForecast() {
 
     loadData();
   }, []);
+
+  // Helper: format the projected percentage label
+  const projectedLabel = (() => {
+    if (forecastChangePct == null || isNaN(forecastChangePct)) {
+      // fallback to your original static text when backend value isn't available
+      return "+5.1% projected";
+    }
+    const sign = forecastChangePct >= 0 ? "+" : "";
+    return `${sign}${forecastChangePct.toFixed(1)}% projected`;
+  })();
+
+  // Helper: pick color based on sign (up = green, down = red)
+  const projectedClass =
+    forecastChangePct != null && !isNaN(forecastChangePct) && forecastChangePct < 0
+      ? "text-xs text-red-600 dark:text-red-400 font-medium"
+      : "text-xs text-emerald-600 dark:text-emerald-400 font-medium";
 
   return (
     <div className="space-y-6">
@@ -107,10 +131,8 @@ function SalesForecast() {
                 <span className="text-xl font-semibold text-slate-900 dark:text-slate-100">
                   {totalForecast}
                 </span>
-                {/* This projected percentage is presentational — you can compute or replace it */}
-                <span className="text-xs text-emerald-600 dark:text-emerald-400 font-medium">
-                  +5.1% projected
-                </span>
+                {/* 🔁 dynamic projected change from backend */}
+                <span className={projectedClass}>{projectedLabel}</span>
               </div>
             </div>
 
