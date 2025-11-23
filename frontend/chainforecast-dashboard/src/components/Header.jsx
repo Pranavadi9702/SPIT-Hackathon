@@ -1,3 +1,4 @@
+// src/components/Header.jsx
 import { useState, useEffect, useRef } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import {
@@ -9,6 +10,9 @@ import {
   ExclamationTriangleIcon,
   CheckCircleIcon,
 } from "@heroicons/react/24/outline";
+
+import { auth } from "../firebase";              // 👈 your firebase config
+import { signOut } from "firebase/auth";         // 👈 firebase logout
 
 const titleMap = {
   "/overview": "Overview",
@@ -28,13 +32,14 @@ function Header({ theme = "light", toggleTheme }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
   const [showLogoutSuccess, setShowLogoutSuccess] = useState(false);
+  const [logoutError, setLogoutError] = useState("");
 
   const profileButtonRef = useRef(null);
   const menuRef = useRef(null);
 
-  // Close dropdown on click outside
+  // Close dropdown when clicking outside
   useEffect(() => {
-    function handleClickOutside(e) {
+    const handleClickOutside = (e) => {
       if (
         menuRef.current &&
         !menuRef.current.contains(e.target) &&
@@ -43,15 +48,12 @@ function Header({ theme = "light", toggleTheme }) {
       ) {
         setIsMenuOpen(false);
       }
-    }
+    };
 
     if (isMenuOpen) {
       document.addEventListener("mousedown", handleClickOutside);
     }
-
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [isMenuOpen]);
 
   const handleSettings = () => {
@@ -59,29 +61,55 @@ function Header({ theme = "light", toggleTheme }) {
     navigate("/settings");
   };
 
-  // Open confirmation dialog instead of logout directly
   const handleLogoutClick = () => {
     setIsMenuOpen(false);
+    setLogoutError("");
     setShowLogoutConfirm(true);
   };
 
-  const confirmLogout = () => {
+  const confirmLogout = async () => {
+  setLogoutError("");
+
+  try {
+    // 🔐 Actually sign the user out from Firebase
+    await signOut(auth);
+
+    // clear common auth keys (optional but useful if you also rely on localStorage/sessionStorage)
+    try {
+      const authKeys = ["token", "authToken", "user", "currentUser", "isAuthenticated"];
+      authKeys.forEach((k) => localStorage.removeItem(k));
+      // sessionStorage.clear(); // uncomment if you use sessionStorage
+    } catch (e) {
+      console.warn("Failed clearing storage after signOut:", e);
+    }
+
     setShowLogoutConfirm(false);
     setShowLogoutSuccess(true);
+
+    // Small delay so user can see the success dialog
     setTimeout(() => {
-      navigate("/login");
+      setShowLogoutSuccess(false);
+      // navigate to the lowercase login route (match your router path exactly)
+      navigate("/login", { replace: true });
     }, 1200);
-  };
+  } catch (err) {
+    console.error("Logout error:", err);
+    setLogoutError(err?.message || "Failed to log out. Please try again.");
+    // keep the confirm dialog open so they can retry or cancel
+  }
+};
+
 
   return (
     <>
-      <header className="h-16 border-b border-slate-200 dark:border-slate-700 bg-white/80 dark:bg-slate-900/80 backdrop-blur flex items-center justify-between px-4 sm:px-6 lg:px-8">
+      {/* Top header bar */}
+      <header className="h-16 z-60 border-b border-slate-200 dark:border-slate-700 bg-white/80 dark:bg-slate-900/80 backdrop-blur flex items-center justify-between px-4 sm:px-6 lg:px-8">
         <h1 className="text-lg sm:text-xl font-semibold tracking-tight text-slate-900 dark:text-slate-100">
           {title}
         </h1>
 
         <div className="flex items-center gap-3">
-          {/* Search */}
+          {/* Search input */}
           <div className="hidden sm:flex items-center bg-slate-100 dark:bg-slate-800 rounded-full px-3 py-1.5">
             <MagnifyingGlassIcon className="h-4 w-4 text-slate-400" />
             <input
@@ -118,7 +146,7 @@ function Header({ theme = "light", toggleTheme }) {
               onClick={() => setIsMenuOpen((prev) => !prev)}
               className="flex items-center gap-2 rounded-full border border-slate-200 dark:border-slate-700 px-2 py-1 hover:bg-slate-50 dark:hover:bg-slate-800"
             >
-              <div className="h-8 w-8 rounded-full bg-gradient-to-br from-brand-500 to-brand-700 text-white flex items-center justify-center text-xs font-semibold">
+              <div className="h-8 w-8 rounded-full bg-gradient-to-br from-indigo-500 to-indigo-700 text-white flex items-center justify-center text-xs font-semibold">
                 SD
               </div>
               <span className="hidden sm:inline text-sm text-slate-700 dark:text-slate-100">
@@ -129,8 +157,8 @@ function Header({ theme = "light", toggleTheme }) {
 
             {isMenuOpen && (
               <div
-                ref={menuRef}
-                className="absolute right-0 mt-2 w-40 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 shadow-lg py-1 z-50"
+               ref={menuRef}
+               className="absolute right-0 mt-2 w-40 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 shadow-lg py-1 z-70 pointer-events-auto"
               >
                 <button
                   onClick={handleSettings}
@@ -152,9 +180,8 @@ function Header({ theme = "light", toggleTheme }) {
 
       {/* Logout confirmation modal */}
       {showLogoutConfirm && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-sm">
+        <div className="fixed inset-0 z-[80] flex items-center justify-center bg-slate-900/40 backdrop-blur-sm">
           <div className="relative w-full max-w-sm rounded-3xl bg-white/95 dark:bg-slate-950/95 border border-slate-100/80 dark:border-slate-800 shadow-[0_24px_80px_rgba(15,23,42,0.45)] px-6 py-6">
-            {/* Accent circle */}
             <div className="flex justify-center mb-4">
               <div className="h-12 w-12 rounded-full bg-gradient-to-tr from-rose-500 via-amber-400 to-amber-300 flex items-center justify-center shadow-md">
                 <ExclamationTriangleIcon className="h-6 w-6 text-white" />
@@ -165,9 +192,15 @@ function Header({ theme = "light", toggleTheme }) {
               Log out of ChainForecast?
             </h2>
             <p className="mt-2 text-sm text-center text-slate-600 dark:text-slate-400">
-              You’ll be signed out of your dashboard. You can log back in any
-              time with your analyst credentials.
+              You’ll be signed out of your dashboard. You can log back in
+              any time with your ChainForecast account.
             </p>
+
+            {logoutError && (
+              <p className="mt-3 text-xs text-center text-red-500">
+                {logoutError}
+              </p>
+            )}
 
             <div className="mt-5 flex flex-col-reverse sm:flex-row gap-2 sm:gap-3">
               <button
@@ -187,9 +220,9 @@ function Header({ theme = "light", toggleTheme }) {
         </div>
       )}
 
-      {/* Logout success modal */}
+      {/* Logout success toast/modal */}
       {showLogoutSuccess && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-sm">
+        <div className="fixed inset-0 z-[80] flex items-center justify-center bg-slate-900/30 backdrop-blur-[1px]">
           <div className="w-full max-w-xs rounded-3xl bg-white/95 dark:bg-slate-950/95 border border-slate-100/80 dark:border-slate-800 shadow-[0_20px_60px_rgba(15,23,42,0.38)] px-6 py-5 text-center">
             <div className="flex justify-center mb-3">
               <div className="h-10 w-10 rounded-full bg-emerald-500 flex items-center justify-center">

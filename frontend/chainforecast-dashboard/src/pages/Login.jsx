@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { auth, googleProvider } from "../firebase"; // 👈 adjust path if needed
 import {
@@ -7,9 +7,19 @@ import {
   signInWithPopup,
   updateProfile,
 } from "firebase/auth";
+import { onAuthStateChanged } from "firebase/auth";
+import Avatar from "../components/Avatar";
 
 function Login() {
   const navigate = useNavigate();
+
+  const [signedInUser, setSignedInUser] = useState(null);
+  useEffect(() => {
+    const unsub = onAuthStateChanged(auth, (u) => {
+      setSignedInUser(u || null);
+    });
+    return () => unsub();
+  }, []);
 
   const [activeTab, setActiveTab] = useState("login"); // "login" | "signup"
 
@@ -153,9 +163,18 @@ function Login() {
               {/* Top brand + nav */}
               <div className="flex items-center justify-between mb-10">
                 <div className="flex items-center gap-3">
-                  <div className="h-9 w-9 rounded-2xl bg-white/10 border border-white/20 flex items-center justify-center text-sm font-semibold shadow-lg">
-                    CF
-                  </div>
+                  {signedInUser ? (
+                    <Avatar
+                      src={signedInUser.photoURL}
+                      name={signedInUser.displayName || "User"}
+                      size="h-9 w-9 text-sm"
+                      className="border border-white/20"
+                    />
+                  ) : (
+                    <div className="h-9 w-9 rounded-2xl bg-white/10 border border-white/20 flex items-center justify-center text-sm font-semibold shadow-lg">
+                      CF
+                    </div>
+                  )}
                   <span className="text-sm font-semibold tracking-wide">
                     ChainForecast
                   </span>
@@ -187,11 +206,15 @@ function Login() {
 
           {/* Right auth panel */}
           <div className="bg-white rounded-b-[32px] md:rounded-r-[32px] md:rounded-bl-none shadow-[0_30px_60px_rgba(15,23,42,0.18)] border border-slate-200 px-7 sm:px-9 py-7 sm:py-9 flex flex-col">
-            {/* Small brand for mobile */}
+            {/* Small brand for mobile (right auth panel) */}
             <div className="md:hidden mb-4 flex items-center gap-2">
-              <div className="h-7 w-7 rounded-xl bg-slate-900 text-white flex items-center justify-center text-xs font-semibold">
-                CF
-              </div>
+              {signedInUser ? (
+                <Avatar src={signedInUser.photoURL} name={signedInUser.displayName || "User"} size="h-7 w-7 text-xs" />
+              ) : (
+                <div className="h-7 w-7 rounded-xl bg-slate-900 text-white flex items-center justify-center text-xs font-semibold">
+                  CF
+                </div>
+              )}
               <span className="text-xs font-semibold text-slate-700">
                 ChainForecast
               </span>

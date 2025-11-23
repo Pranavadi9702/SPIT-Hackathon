@@ -1,15 +1,33 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { auth } from "../firebase";
+import { onAuthStateChanged } from "firebase/auth";
+import Avatar from "../components/Avatar";
 
 function Settings() {
   const navigate = useNavigate();
 
-  // Mock user details – later you can replace with real data from backend
-  const [user] = useState({
+  // User details (uses Firebase auth when available)
+  const [user, setUser] = useState({
     name: "Analyst User",
     email: "analyst@chainforecast.ai",
     role: "Sales & CRM Analyst",
+    photoURL: null,
   });
+
+  useEffect(() => {
+    const unsub = onAuthStateChanged(auth, (u) => {
+      if (u) {
+        setUser((prev) => ({
+          ...prev,
+          name: u.displayName || prev.name,
+          email: u.email || prev.email,
+          photoURL: u.photoURL || null,
+        }));
+      }
+    });
+    return () => unsub();
+  }, []);
 
   // Password update state
   const [currentPassword, setCurrentPassword] = useState("");
@@ -71,9 +89,11 @@ function Settings() {
       <div className="bg-white/90 dark:bg-slate-900/80 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 p-4 lg:p-6 text-sm flex flex-col gap-4">
         <div className="flex items-start justify-between gap-4">
           <div className="flex items-center gap-4">
-            <div className="h-12 w-12 rounded-2xl bg-gradient-to-br from-brand-500 to-brand-700 text-white flex items-center justify-center text-lg font-semibold">
-              {user.name.charAt(0)}
-            </div>
+            <Avatar
+              src={user?.photoURL}
+              name={user?.name || "Analyst User"}
+              size="h-12 w-12 text-lg"
+            />
             <div>
               <h2 className="text-sm font-semibold text-slate-900 dark:text-slate-100">
                 Profile

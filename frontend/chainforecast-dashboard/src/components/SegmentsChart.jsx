@@ -152,19 +152,6 @@ function SegmentsChart({ data, totalCustomers }) {
           ))}
         </div>
       </div>
-
-      {/* Footer buttons */}
-      <div className="px-6 pb-4 flex items-center gap-3">
-        <button
-          onClick={() => navigate("/customer-segmentation")}
-          className="rounded-full bg-indigo-500 px-4 py-1.5 text-xs font-medium text-white shadow-sm hover:bg-indigo-600 dark:hover:bg-indigo-400 transition"
-        >
-          View Details
-        </button>
-        <button className="rounded-full border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-4 py-1.5 text-xs font-medium text-slate-700 dark:text-slate-100 shadow-sm">
-          Export
-        </button>
-      </div>
     </div>
   );
 }

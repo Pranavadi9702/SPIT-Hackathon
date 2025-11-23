@@ -96,30 +96,41 @@ function CustomerSegmentation() {
     };
   }, [customers]);
 
+  // build a normalized lookup from the segmentDistribution so KPI cards use the same numbers as charts
+  const normalize = (s) => (s || "").toString().replace(/\W/g, "").toLowerCase();
+  const segLookup = {};
+  segmentDistribution.forEach((s) => {
+    const raw = normalize(s.name);
+    segLookup[raw] = s.value;
+    if (raw.endsWith("customers")) segLookup[raw.replace(/customers$/, "")] = s.value;
+    if (raw.endsWith("s")) segLookup[raw.slice(0, -1)] = s.value;
+  });
+
+  const cardSegments = [
+    { key: "champions", label: "Champions", icon: "🏆", subLabel: "Most engaged & valuable" },
+    { key: "loyal", label: "Loyal Customers", icon: "💚", subLabel: "Repeat buyers" },
+    { key: "atrisk", label: "At-Risk customers", icon: "⚠️", subLabel: "Need re-engagement" },
+    { key: "lost", label: "Lost Customers", icon: "🧡", subLabel: "No recent activity" },
+    { key: "potentialloyalists", label: "Potential Loyalists", icon: "🌱", subLabel: "Could be nurtured" },
+  ];
+
   const statsCards = [
     {
-      id: 1,
+      id: "total",
       label: "Total customers",
       value: totalCustomers.toLocaleString(),
       subLabel: "Across all RFM segments",
       icon: "👥",
     },
+    ...cardSegments.map((seg, i) => ({
+      id: `seg-${i}`,
+      label: seg.label,
+      value: (segLookup[seg.key] || 0).toLocaleString(),
+      subLabel: seg.subLabel,
+      icon: seg.icon,
+    })),
     {
-      id: 2,
-      label: "Champions",
-      value: championsCount.toLocaleString(),
-      subLabel: "Most engaged & valuable",
-      icon: "🏆",
-    },
-    {
-      id: 3,
-      label: "At-Risk customers",
-      value: atRiskCount.toLocaleString(),
-      subLabel: "Need re-engagement",
-      icon: "⚠️",
-    },
-    {
-      id: 4,
+      id: "avg",
       label: "Avg revenue / customer",
       value: `₹${Math.round(avgMonetary).toLocaleString()}`,
       subLabel: "Based on monetary value",
@@ -127,17 +138,68 @@ function CustomerSegmentation() {
     },
   ];
 
+  // Pagination: client-side paging of the customers table
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+  const pageSizes = [10, 25, 50, 100];
+  const totalPages = Math.max(1, Math.ceil(customers.length / pageSize));
+  // toast for toggles
+  const [toast, setToast] = useState({ show: false, text: "" });
+  const showToast = (text) => {
+    setToast({ show: true, text });
+    setTimeout(() => setToast({ show: false, text: "" }), 3500);
+  };
+  const handleSegmentToggle = (segmentKey, enabled) => {
+    if (enabled) {
+      showToast(
+        "A SMS has been sent to all the customers on their respective phone numbers."
+      );
+      // optional: trigger backend call here to actually send messages
+      // sendSmsToSegment(segmentKey);
+    }
+  };
+  // reset page when data or pageSize changes
+  useEffect(() => {
+    setPage(1);
+  }, [customers, pageSize]);
+
+  const paginatedCustomers = useMemo(() => {
+    const start = (page - 1) * pageSize;
+    return customers.slice(start, start + pageSize);
+  }, [customers, page, pageSize]);
+
   return (
     <div className="space-y-6">
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
-        <div>
-          <h1 className="text-2xl font-semibold text-slate-900 dark:text-slate-100">
-            Customer Segmentation
-          </h1>
-          <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
-            RFM-based segments with behavioral metrics and cohort insights.
-          </p>
+        <div className="flex flex-col md:flex-row md:items-center md:gap-6">
+          {/* Rows per page now sits beside the title (desktop) */}
+          <div className="hidden md:flex flex-col items-start gap-1 text-xs">
+            <div className="text-[11px] text-slate-500 dark:text-slate-400">Rows per page</div>
+            <select
+              value={pageSize}
+              onChange={(e) => {
+                setPageSize(Number(e.target.value));
+                setPage(1);
+              }}
+              className="text-sm px-2 py-1 bg-white/90 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded text-slate-700 dark:text-slate-100"
+            >
+              {pageSizes.map((s) => (
+                <option key={s} value={s}>
+                  {s}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div>
+            <h1 className="text-2xl font-semibold text-slate-900 dark:text-slate-100">
+              Customer Segmentation
+            </h1>
+            <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
+              RFM-based segments with behavioral metrics and cohort insights.
+            </p>
+          </div>
         </div>
 
         <div className="flex items-center gap-3">
@@ -151,6 +213,7 @@ function CustomerSegmentation() {
               🔍
             </span>
           </div>
+
           <button className="rounded-full bg-indigo-500 px-3.5 py-1.5 text-xs font-medium text-white shadow-sm hover:bg-indigo-600 dark:hover:bg-indigo-400 transition">
             Export segment report
           </button>
@@ -338,7 +401,77 @@ function CustomerSegmentation() {
       </div>
 
       {/* Table */}
-      <CustomersTable customers={customers} />
+      {/* Table (paginated) */}
+      <CustomersTable customers={paginatedCustomers} />
+
+      {/* Pagination controls */}
+      <div className="flex items-center justify-between mt-4 gap-3">
+        <div className="flex items-center gap-2 text-xs text-slate-600 dark:text-slate-400">
+          <span>Rows per page</span>
+          <select
+            value={pageSize}
+            onChange={(e) => setPageSize(Number(e.target.value))}
+            className="text-sm px-2 py-1 bg-white/90 dark:bg-slate-800 border rounded text-slate-700 dark:text-slate-100"
+          >
+            {pageSizes.map((s) => (
+              <option key={s} value={s}>
+                {s}
+              </option>
+            ))}
+          </select>
+          <span className="ml-2">
+            {customers.length.toLocaleString()} total
+          </span>
+        </div>
+
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => setPage(1)}
+            disabled={page === 1}
+            className="px-2 py-1 rounded bg-slate-100 text-slate-700 dark:bg-slate-700 dark:text-slate-100 text-xs disabled:opacity-40"
+          >
+            « First
+          </button>
+          <button
+            onClick={() => setPage((p) => Math.max(1, p - 1))}
+            disabled={page === 1}
+            className="px-2 py-1 rounded bg-slate-100 text-slate-700 dark:bg-slate-700 dark:text-slate-100 text-xs disabled:opacity-40"
+          >
+            ‹ Prev
+          </button>
+
+          <div className="text-xs px-3">
+            Page{" "}
+            <input
+              type="number"
+              min={1}
+              max={totalPages}
+              value={page}
+              onChange={(e) => {
+                const v = Number(e.target.value) || 1;
+                setPage(Math.min(Math.max(1, v), totalPages));
+              }}
+              className="w-12 text-center bg-transparent outline-none text-slate-700 dark:text-slate-100"
+            />{" "}
+            of {totalPages}
+          </div>
+
+          <button
+            onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+            disabled={page === totalPages}
+            className="px-2 py-1 rounded bg-slate-100 text-slate-700 dark:bg-slate-700 dark:text-slate-100 text-xs disabled:opacity-40"
+          >
+            Next ›
+          </button>
+          <button
+            onClick={() => setPage(totalPages)}
+            disabled={page === totalPages}
+            className="px-2 py-1 rounded bg-slate-100 text-slate-700 dark:bg-slate-700 dark:text-slate-100 text-xs disabled:opacity-40"
+          >
+            Last »
+          </button>
+        </div>
+      </div>
     </div>
   );
 }
