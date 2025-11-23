@@ -2,21 +2,44 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { auth, googleProvider } from "../firebase"; // 👈 adjust path if needed
 import {
-  signInWithEmailAndPassword,
-  createUserWithEmailAndPassword,
   signInWithPopup,
-  updateProfile,
+  onAuthStateChanged,
 } from "firebase/auth";
-import { onAuthStateChanged } from "firebase/auth";
 import Avatar from "../components/Avatar";
+import { loginWithEmail, signupWithEmail } from "../api/backend";
 
 function Login() {
   const navigate = useNavigate();
 
   const [signedInUser, setSignedInUser] = useState(null);
+
+  // Keep Firebase Google login working, but also restore JWT user from storage
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, (u) => {
-      setSignedInUser(u || null);
+      if (u) {
+        setSignedInUser({
+          uid: u.uid,
+          email: u.email,
+          displayName: u.displayName || u.email || "User",
+          photoURL: u.photoURL,
+          provider: "firebase",
+        });
+      } else {
+        // If no Firebase user, fall back to JWT user in storage
+        try {
+          const stored =
+            window.localStorage.getItem("cf_user") ||
+            window.sessionStorage.getItem("cf_user");
+          if (stored) {
+            const parsed = JSON.parse(stored);
+            setSignedInUser(parsed);
+          } else {
+            setSignedInUser(null);
+          }
+        } catch {
+          setSignedInUser(null);
+        }
+      }
     });
     return () => unsub();
   }, []);
@@ -57,19 +80,33 @@ function Login() {
     try {
       setLoginLoading(true);
 
-      // Optional: control persistence based on rememberMe
-      // import { setPersistence, browserLocalPersistence, browserSessionPersistence } from "firebase/auth";
-      // await setPersistence(auth, rememberMe ? browserLocalPersistence : browserSessionPersistence);
+      // 🔐 Call backend JWT login instead of Firebase email/password
+      const data = await loginWithEmail(loginEmail, loginPassword);
+      const { token, user } = data;
 
-      await signInWithEmailAndPassword(auth, loginEmail, loginPassword);
+      const storage = rememberMe
+        ? window.localStorage
+        : window.sessionStorage;
+
+      if (token) {
+        storage.setItem("cf_jwt", token);
+      }
+
+      const normalizedUser = {
+        email: user?.email || loginEmail,
+        displayName: user?.name || user?.displayName || loginEmail,
+        photoURL: user?.photoURL || null,
+        provider: "jwt",
+      };
+
+      storage.setItem("cf_user", JSON.stringify(normalizedUser));
+      setSignedInUser(normalizedUser);
 
       navigate("/overview");
     } catch (err) {
       console.error("Login error:", err);
       setGlobalError(
-        err.code === "auth/invalid-credential"
-          ? "Invalid email or password."
-          : err.message || "Failed to log in. Please try again."
+        err.message || "Failed to log in. Please try again."
       );
     } finally {
       setLoginLoading(false);
@@ -98,28 +135,22 @@ function Login() {
     try {
       setSignupLoading(true);
 
-      const userCred = await createUserWithEmailAndPassword(
-        auth,
+      // 🔐 Call backend signup (stores hashed password in Firestore + returns JWT)
+      await signupWithEmail(
+        signupName,
         signupEmail,
         signupPassword
       );
 
-      // Set display name
-      if (signupName.trim()) {
-        await updateProfile(userCred.user, {
-          displayName: signupName,
-        });
-      }
-
+      // Keep previous UX: ask user to log in after signup
       setGlobalMessage("Signup successful. You can now log in.");
       setActiveTab("login");
       setLoginEmail(signupEmail);
     } catch (err) {
       console.error("Signup error:", err);
       setGlobalError(
-        err.code === "auth/email-already-in-use"
-          ? "An account with this email already exists."
-          : err.message || "Failed to create account. Please try again."
+        err.message ||
+          "Failed to create account. Please try again."
       );
     } finally {
       setSignupLoading(false);
@@ -131,9 +162,6 @@ function Login() {
     setGlobalMessage("");
 
     try {
-      // You can add scopes if needed:
-      // googleProvider.addScope("https://www.googleapis.com/auth/contacts.readonly");
-
       await signInWithPopup(auth, googleProvider);
       navigate("/overview");
     } catch (err) {
@@ -209,7 +237,11 @@ function Login() {
             {/* Small brand for mobile (right auth panel) */}
             <div className="md:hidden mb-4 flex items-center gap-2">
               {signedInUser ? (
-                <Avatar src={signedInUser.photoURL} name={signedInUser.displayName || "User"} size="h-7 w-7 text-xs" />
+                <Avatar
+                  src={signedInUser.photoURL}
+                  name={signedInUser.displayName || "User"}
+                  size="h-7 w-7 text-xs"
+                />
               ) : (
                 <div className="h-7 w-7 rounded-xl bg-slate-900 text-white flex items-center justify-center text-xs font-semibold">
                   CF
@@ -313,7 +345,9 @@ function Login() {
                   </label>
                   <div
                     className={`flex items-center rounded-full px-3 py-2 border text-xs bg-slate-100 ${
-                      loginErrors.password ? "border-red-300" : "border-slate-200"
+                      loginErrors.password
+                        ? "border-red-300"
+                        : "border-slate-200"
                     }`}
                   >
                     <span className="mr-2 text-slate-400 text-[13px]">•••</span>
@@ -392,7 +426,9 @@ function Login() {
                     </label>
                     <div
                       className={`flex items-center rounded-full px-3 py-2 border text-xs bg-slate-100 ${
-                        signupErrors.name ? "border-red-300" : "border-slate-200"
+                        signupErrors.name
+                          ? "border-red-300"
+                          : "border-slate-200"
                       }`}
                     >
                       <input
@@ -416,7 +452,9 @@ function Login() {
                     </label>
                     <div
                       className={`flex items-center rounded-full px-3 py-2 border text-xs bg-slate-100 ${
-                        signupErrors.email ? "border-red-300" : "border-slate-200"
+                        signupErrors.email
+                          ? "border-red-300"
+                          : "border-slate-200"
                       }`}
                     >
                       <span className="mr-2 text-slate-400 text-[13px]">@</span>
@@ -442,7 +480,9 @@ function Login() {
                   </label>
                   <div
                     className={`flex items-center rounded-full px-3 py-2 border text-xs bg-slate-100 ${
-                      signupErrors.password ? "border-red-300" : "border-slate-200"
+                      signupErrors.password
+                        ? "border-red-300"
+                        : "border-slate-200"
                     }`}
                   >
                     <span className="mr-2 text-slate-400 text-[13px]">•••</span>
@@ -477,7 +517,9 @@ function Login() {
                       className="w-full bg-transparent outline-none text-slate-900 placeholder:text-slate-400"
                       placeholder="Repeat your password"
                       value={signupConfirmPassword}
-                      onChange={(e) => setSignupConfirmPassword(e.target.value)}
+                      onChange={(e) =>
+                        setSignupConfirmPassword(e.target.value)
+                      }
                     />
                   </div>
                   {signupErrors.confirmPassword && (

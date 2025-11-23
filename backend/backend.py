@@ -26,13 +26,17 @@ import matplotlib.pyplot as plt  # <-- for plots
 from flask import Flask, jsonify, request
 from flask_cors import CORS
 
-# ---------------- NEW IMPORTS: ENV + BLOCKCHAIN + FIREBASE ----------------
+# ---------------- NEW IMPORTS: ENV + BLOCKCHAIN + FIREBASE + JWT/AUTH ----------------
 from dotenv import load_dotenv
 load_dotenv()
 
 from web3 import Web3
 import firebase_admin
 from firebase_admin import credentials, firestore
+
+# 🔐 NEW: JWT + password hashing
+import jwt
+from werkzeug.security import generate_password_hash, check_password_hash
 
 # ======================= ENV CONFIG FOR INTEGRATIONS =======================
 
@@ -45,6 +49,11 @@ FORECAST_CONTRACT_ADDRESS = os.getenv("FORECAST_CONTRACT_ADDRESS")
 GANACHE_CHAIN_ID = int(os.getenv("GANACHE_CHAIN_ID", "1337"))
 
 API_SECRET_KEY = os.getenv("API_SECRET_KEY", "supersecret")
+
+# 🔐 NEW: JWT configuration
+JWT_SECRET = os.getenv("JWT_SECRET", "superjwtsecret")
+JWT_ALGORITHM = "HS256"
+JWT_EXPIRES_MINUTES = int(os.getenv("JWT_EXPIRES_MINUTES", "120"))
 
 # ===== RATE LIMIT CONFIG =====
 # Allow up to MAX_LOG_REQUESTS_PER_WINDOW logs every LOG_RATE_LIMIT_WINDOW_SECONDS seconds.
@@ -349,6 +358,28 @@ def log_forecast_onchain_and_firebase(total_forecast, model_version="lstm_weekly
     print("⚠ Firestore client not available; skipping Firebase logging.")
 
   return result
+
+# ======================= JWT HELPER =======================
+
+def create_jwt_token(email, name=None):
+  """
+  Create a signed JWT for the given user email/name.
+  """
+  now = int(time.time())
+  payload = {
+    "sub": email,
+    "email": email,
+    "iat": now,
+    "exp": now + JWT_EXPIRES_MINUTES * 60,
+  }
+  if name:
+    payload["name"] = name
+
+  token = jwt.encode(payload, JWT_SECRET, algorithm=JWT_ALGORITHM)
+  # In PyJWT>=2, this is a str, but guard for bytes:
+  if isinstance(token, bytes):
+    token = token.decode("utf-8")
+  return token
 
 # =======================
 # TensorFlow / LSTM
@@ -1454,6 +1485,142 @@ def segments_summary():
     return jsonify({
       "status": "error",
       "message": str(e),
+    }), 500
+
+# =========================================================
+# NEW: EMAIL/PASSWORD JWT AUTH (FIRESTORE USERS)
+# =========================================================
+
+@app.route("/api/auth/signup", methods=["POST"])
+def auth_signup():
+  """
+  Email/password signup.
+  - Hashes password securely.
+  - Stores user in Firestore 'users' collection.
+  - Returns a JWT (even though frontend may only use it later).
+  """
+  try:
+    init_firebase()
+    if firestore_client is None:
+      return jsonify({
+        "status": "error",
+        "message": "Firebase not configured on backend."
+      }), 200
+
+    data = request.get_json(silent=True) or {}
+    name = (data.get("name") or "").strip()
+    email = (data.get("email") or "").strip().lower()
+    password = data.get("password") or ""
+
+    if not email or not password or not name:
+      return jsonify({
+        "status": "error",
+        "message": "Name, email and password are required."
+      }), 200
+
+    if len(password) < 8:
+      return jsonify({
+        "status": "error",
+        "message": "Password must be at least 8 characters."
+      }), 200
+
+    users_col = firestore_client.collection("users")
+    doc_ref = users_col.document(email)
+    doc = doc_ref.get()
+    if doc.exists:
+      return jsonify({
+        "status": "error",
+        "message": "An account with this email already exists."
+      }), 200
+
+    password_hash = generate_password_hash(password)
+
+    doc_ref.set({
+      "email": email,
+      "name": name,
+      "password_hash": password_hash,
+      "created_at": firestore.SERVER_TIMESTAMP,
+    })
+
+    token = create_jwt_token(email=email, name=name)
+
+    return jsonify({
+      "status": "success",
+      "token": token,
+      "user": {
+        "email": email,
+        "name": name,
+      },
+    }), 200
+
+  except Exception as e:
+    print("⚠ Error in /api/auth/signup:", e)
+    return jsonify({
+      "status": "error",
+      "message": "Signup failed on server."
+    }), 500
+
+@app.route("/api/auth/login", methods=["POST"])
+def auth_login():
+  """
+  Email/password login.
+  - Looks up Firestore 'users' collection.
+  - Verifies hashed password.
+  - Returns JWT if valid.
+  """
+  try:
+    init_firebase()
+    if firestore_client is None:
+      return jsonify({
+        "status": "error",
+        "message": "Firebase not configured on backend."
+      }), 200
+
+    data = request.get_json(silent=True) or {}
+    email = (data.get("email") or "").strip().lower()
+    password = data.get("password") or ""
+
+    if not email or not password:
+      return jsonify({
+        "status": "error",
+        "message": "Email and password are required."
+      }), 200
+
+    users_col = firestore_client.collection("users")
+    doc_ref = users_col.document(email)
+    doc = doc_ref.get()
+    if not doc.exists:
+      # Do not reveal which field was wrong
+      return jsonify({
+        "status": "error",
+        "message": "Invalid email or password."
+      }), 200
+
+    user_data = doc.to_dict() or {}
+    stored_hash = user_data.get("password_hash")
+    if not stored_hash or not check_password_hash(stored_hash, password):
+      return jsonify({
+        "status": "error",
+        "message": "Invalid email or password."
+      }), 200
+
+    name = user_data.get("name") or email
+    token = create_jwt_token(email=email, name=name)
+
+    return jsonify({
+      "status": "success",
+      "token": token,
+      "user": {
+        "email": email,
+        "name": name,
+      }
+    }), 200
+
+  except Exception as e:
+    print("⚠ Error in /api/auth/login:", e)
+    return jsonify({
+      "status": "error",
+      "message": "Login failed on server."
     }), 500
 
 # =========================================================
